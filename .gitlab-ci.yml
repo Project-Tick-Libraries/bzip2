@@ -1,0 +1,18 @@
+debian build:
+  image: 'debian:buster'
+  before_script:
+    - apt update -y
+    - apt install -y autoconf automake make libtool pkg-config gcc
+  script:
+    - mkdir builddir && cd builddir
+    - ../autogen.sh 
+    - make
+    - make check
+  after_script:
+    - cp builddir/config.status builddir/config.log .
+    - rm -rf builddir
+  artifacts:
+    paths:
+      - 'config.status'
+      - 'config.log'
+  
