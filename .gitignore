@@ -27,3 +27,8 @@ manual.*
 missing
 tests/*.rb2
 tests/*.tst
+
+# Windows build outputs
+*.exe
+*.lib
+*.obj
