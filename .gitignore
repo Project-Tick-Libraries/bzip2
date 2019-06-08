@@ -29,6 +29,8 @@ tests/*.rb2
 tests/*.tst
 
 # Windows build outputs
+*.dll
 *.exe
+*.exp
 *.lib
 *.obj
