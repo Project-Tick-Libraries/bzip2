@@ -46,7 +46,7 @@ static
 void bsFinishWrite ( EState* s )
 {
    while (s->bsLive > 0) {
-      s->zbits[s->numZ] = (UChar)(s->bsBuff >> 24);
+      s->zbits[s->numZ] = (uint8_t)(s->bsBuff >> 24);
       s->numZ++;
       s->bsBuff <<= 8;
       s->bsLive -= 8;
@@ -59,7 +59,7 @@ void bsFinishWrite ( EState* s )
 {                                             \
    while (s->bsLive >= 8) {                   \
       s->zbits[s->numZ]                       \
-         = (UChar)(s->bsBuff >> 24);          \
+         = (uint8_t)(s->bsBuff >> 24);          \
       s->numZ++;                              \
       s->bsBuff <<= 8;                        \
       s->bsLive -= 8;                         \
@@ -70,7 +70,7 @@ void bsFinishWrite ( EState* s )
 /*---------------------------------------------------*/
 static
 __inline__
-void bsW ( EState* s, Int32 n, UInt32 v )
+void bsW ( EState* s, int32_t n, uint32_t v )
 {
    bsNEEDW ( n );
    s->bsBuff |= (v << (32 - s->bsLive - n));
@@ -80,7 +80,7 @@ void bsW ( EState* s, Int32 n, UInt32 v )
 
 /*---------------------------------------------------*/
 static
-void bsPutUInt32 ( EState* s, UInt32 u )
+void bsPutUInt32 ( EState* s, uint32_t u )
 {
    bsW ( s, 8, (u >> 24) & 0xffL );
    bsW ( s, 8, (u >> 16) & 0xffL );
@@ -91,9 +91,9 @@ void bsPutUInt32 ( EState* s, UInt32 u )
 
 /*---------------------------------------------------*/
 static
-void bsPutUChar ( EState* s, UChar c )
+void bsPutUChar ( EState* s, uint8_t c )
 {
-   bsW( s, 8, (UInt32)c );
+   bsW( s, 8, (uint32_t)c );
 }
 
 
@@ -105,7 +105,7 @@ void bsPutUChar ( EState* s, UChar c )
 static
 void makeMaps_e ( EState* s )
 {
-   Int32 i;
+   int32_t i;
    s->nInUse = 0;
    for (i = 0; i < 256; i++)
       if (s->inUse[i]) {
@@ -119,37 +119,37 @@ void makeMaps_e ( EState* s )
 static
 void generateMTFValues ( EState* s )
 {
-   UChar   yy[256];
-   Int32   i, j;
-   Int32   zPend;
-   Int32   wr;
-   Int32   EOB;
+   uint8_t   yy[256];
+   int32_t   i, j;
+   int32_t   zPend;
+   int32_t   wr;
+   int32_t   EOB;
 
    /*
       After sorting (eg, here),
          s->arr1 [ 0 .. s->nblock-1 ] holds sorted order,
          and
-         ((UChar*)s->arr2) [ 0 .. s->nblock-1 ]
+         ((uint8_t*)s->arr2) [ 0 .. s->nblock-1 ]
          holds the original block data.
 
       The first thing to do is generate the MTF values,
       and put them in
-         ((UInt16*)s->arr1) [ 0 .. s->nblock-1 ].
+         ((uint16_t*)s->arr1) [ 0 .. s->nblock-1 ].
       Because there are strictly fewer or equal MTF values
       than block values, ptr values in this area are overwritten
       with MTF values only when they are no longer needed.
 
       The final compressed bitstream is generated into the
       area starting at
-         (UChar*) (&((UChar*)s->arr2)[s->nblock])
+         (uint8_t*) (&((uint8_t*)s->arr2)[s->nblock])
 
       These storage aliases are set up in bzCompressInit(),
       except for the last one, which is arranged in
       compressBlock().
    */
-   UInt32* ptr   = s->ptr;
-   UChar* block  = s->block;
-   UInt16* mtfv  = s->mtfv;
+   uint32_t* ptr   = s->ptr;
+   uint8_t*  block = s->block;
+   uint16_t* mtfv  = s->mtfv;
 
    makeMaps_e ( s );
    EOB = s->nInUse+1;
@@ -158,10 +158,10 @@ void generateMTFValues ( EState* s )
 
    wr = 0;
    zPend = 0;
-   for (i = 0; i < s->nInUse; i++) yy[i] = (UChar) i;
+   for (i = 0; i < s->nInUse; i++) yy[i] = (uint8_t) i;
 
    for (i = 0; i < s->nblock; i++) {
-      UChar ll_i;
+      uint8_t ll_i;
       AssertD ( wr <= i, "generateMTFValues(1)" );
       j = ptr[i]-1; if (j < 0) j += s->nblock;
       ll_i = s->unseqToSeq[block[j]];
@@ -173,7 +173,7 @@ void generateMTFValues ( EState* s )
 
          if (zPend > 0) {
             zPend--;
-            while (True) {
+            while (true) {
                if (zPend & 1) {
                   mtfv[wr] = BZ_RUNB; wr++;
                   s->mtfFreq[BZ_RUNB]++;
@@ -187,15 +187,15 @@ void generateMTFValues ( EState* s )
             zPend = 0;
          }
          {
-            register UChar  rtmp;
-            register UChar* ryy_j;
-            register UChar  rll_i;
+            register uint8_t  rtmp;
+            register uint8_t* ryy_j;
+            register uint8_t  rll_i;
             rtmp  = yy[1];
             yy[1] = yy[0];
             ryy_j = &(yy[1]);
             rll_i = ll_i;
             while ( rll_i != rtmp ) {
-               register UChar rtmp2;
+               register uint8_t rtmp2;
                ryy_j++;
                rtmp2  = rtmp;
                rtmp   = *ryy_j;
@@ -211,7 +211,7 @@ void generateMTFValues ( EState* s )
 
    if (zPend > 0) {
       zPend--;
-      while (True) {
+      while (true) {
          if (zPend & 1) {
             mtfv[wr] = BZ_RUNB; wr++;
             s->mtfFreq[BZ_RUNB]++;
@@ -238,25 +238,25 @@ void generateMTFValues ( EState* s )
 static
 void sendMTFValues ( EState* s )
 {
-   Int32 v, t, i, j, gs, ge, totc, bt, bc, iter;
-   Int32 nSelectors, alphaSize, minLen, maxLen, selCtr;
-   Int32 nGroups, nBytes;
+   int32_t v, t, i, j, gs, ge, totc, bt, bc, iter;
+   int32_t nSelectors, alphaSize, minLen, maxLen, selCtr;
+   int32_t nGroups, nBytes;
 
    /*--
-   UChar  len [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
+   uint8_t  len [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
    is a global since the decoder also needs it.
 
-   Int32  code[BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
-   Int32  rfreq[BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
+   int32_t  code[BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
+   int32_t  rfreq[BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
    are also globals only used in this proc.
    Made global to keep stack frame size small.
    --*/
 
 
-   UInt16 cost[BZ_N_GROUPS];
-   Int32  fave[BZ_N_GROUPS];
+   uint16_t cost[BZ_N_GROUPS];
+   int32_t  fave[BZ_N_GROUPS];
 
-   UInt16* mtfv = s->mtfv;
+   uint16_t* mtfv = s->mtfv;
 
    if (s->verbosity >= 3)
       VPrintf3( "      %d in block, %d after MTF & 1-2 coding, "
@@ -278,7 +278,7 @@ void sendMTFValues ( EState* s )
 
    /*--- Generate an initial set of coding tables ---*/
    {
-      Int32 nPart, remF, tFreq, aFreq;
+      int32_t nPart, remF, tFreq, aFreq;
 
       nPart = nGroups;
       remF  = s->nMTF;
@@ -342,7 +342,7 @@ void sendMTFValues ( EState* s )
       nSelectors = 0;
       totc = 0;
       gs = 0;
-      while (True) {
+      while (true) {
 
          /*--- Set group start & end marks. --*/
          if (gs >= s->nMTF) break;
@@ -357,8 +357,8 @@ void sendMTFValues ( EState* s )
 
          if (nGroups == 6 && 50 == ge-gs+1) {
             /*--- fast track the common case ---*/
-            register UInt32 cost01, cost23, cost45;
-            register UInt16 icv;
+            register uint32_t cost01, cost23, cost45;
+            register uint16_t icv;
             cost01 = cost23 = cost45 = 0;
 
 #           define BZ_ITER(nn)                \
@@ -387,7 +387,7 @@ void sendMTFValues ( EState* s )
          } else {
             /*--- slow version which correctly handles all situations ---*/
             for (i = gs; i <= ge; i++) {
-               UInt16 icv = mtfv[i];
+               uint16_t icv = mtfv[i];
                for (t = 0; t < nGroups; t++) cost[t] += s->len[t][icv];
             }
          }
@@ -460,7 +460,7 @@ void sendMTFValues ( EState* s )
 
    /*--- Compute MTF values for the selectors. ---*/
    {
-      UChar pos[BZ_N_GROUPS], ll_i, tmp2, tmp;
+      uint8_t pos[BZ_N_GROUPS], ll_i, tmp2, tmp;
       for (i = 0; i < nGroups; i++) pos[i] = i;
       for (i = 0; i < nSelectors; i++) {
          ll_i = s->selector[i];
@@ -493,11 +493,11 @@ void sendMTFValues ( EState* s )
 
    /*--- Transmit the mapping table. ---*/
    {
-      Bool inUse16[16];
+      bool inUse16[16];
       for (i = 0; i < 16; i++) {
-          inUse16[i] = False;
+          inUse16[i] = false;
           for (j = 0; j < 16; j++)
-             if (s->inUse[i * 16 + j]) inUse16[i] = True;
+             if (s->inUse[i * 16 + j]) inUse16[i] = true;
       }
 
       nBytes = s->numZ;
@@ -529,7 +529,7 @@ void sendMTFValues ( EState* s )
    nBytes = s->numZ;
 
    for (t = 0; t < nGroups; t++) {
-      Int32 curr = s->len[t][0];
+      int32_t curr = s->len[t][0];
       bsW ( s, 5, curr );
       for (i = 0; i < alphaSize; i++) {
          while (curr < s->len[t][i]) { bsW(s,2,2); curr++; /* 10 */ };
@@ -545,7 +545,7 @@ void sendMTFValues ( EState* s )
    nBytes = s->numZ;
    selCtr = 0;
    gs = 0;
-   while (True) {
+   while (true) {
       if (gs >= s->nMTF) break;
       ge = gs + BZ_G_SIZE - 1;
       if (ge >= s->nMTF) ge = s->nMTF-1;
@@ -553,10 +553,10 @@ void sendMTFValues ( EState* s )
 
       if (nGroups == 6 && 50 == ge-gs+1) {
             /*--- fast track the common case ---*/
-            UInt16 mtfv_i;
-            UChar* s_len_sel_selCtr
+            uint16_t mtfv_i;
+            uint8_t* s_len_sel_selCtr
                = &(s->len[s->selector[selCtr]][0]);
-            Int32* s_code_sel_selCtr
+            int32_t* s_code_sel_selCtr
                = &(s->code[s->selector[selCtr]][0]);
 
 #           define BZ_ITAH(nn)                      \
@@ -598,7 +598,7 @@ void sendMTFValues ( EState* s )
 
 
 /*---------------------------------------------------*/
-void BZ2_compressBlock ( EState* s, Bool is_last_block )
+void BZ2_compressBlock ( EState* s, bool is_last_block )
 {
    if (s->nblock > 0) {
 
@@ -615,7 +615,7 @@ void BZ2_compressBlock ( EState* s, Bool is_last_block )
       BZ2_blockSort ( s );
    }
 
-   s->zbits = (UChar*) (&((UChar*)s->arr2)[s->nblock]);
+   s->zbits = (uint8_t*) (&((uint8_t*)s->arr2)[s->nblock]);
 
    /*-- If this is the first block, create the stream header. --*/
    if (s->blockNo == 1) {
@@ -623,7 +623,7 @@ void BZ2_compressBlock ( EState* s, Bool is_last_block )
       bsPutUChar ( s, BZ_HDR_B );
       bsPutUChar ( s, BZ_HDR_Z );
       bsPutUChar ( s, BZ_HDR_h );
-      bsPutUChar ( s, (UChar)(BZ_HDR_0 + s->blockSize100k) );
+      bsPutUChar ( s, (uint8_t)(BZ_HDR_0 + s->blockSize100k) );
    }
 
    if (s->nblock > 0) {

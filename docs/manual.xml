@@ -650,13 +650,7 @@ file in the stream.</para>
 prior to 1.0.2 used 32-bit integers to represent bit positions in
 compressed files, so it could not handle compressed files more
 than 512 megabytes long.  Versions 1.0.2 and above use 64-bit ints
-on some platforms which support them (GNU supported targets, and
-Windows). To establish whether or not
-<computeroutput>bzip2recover</computeroutput> was built with such
-a limitation, run it without arguments. In any event you can
-build yourself an unlimited version if you can recompile it with
-<computeroutput>MaybeUInt64</computeroutput> set to be an
-unsigned 64-bit integer.</para>
+(GNU supported targets, and Windows).</para>
 
 </sect1>
 

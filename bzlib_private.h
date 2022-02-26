@@ -22,6 +22,8 @@
 #ifndef _BZLIB_PRIVATE_H
 #define _BZLIB_PRIVATE_H
 
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #ifndef BZ_NO_STDIO
@@ -35,17 +37,6 @@
 
 
 /*-- General stuff. --*/
-
-typedef char            Char;
-typedef unsigned char   Bool;
-typedef unsigned char   UChar;
-typedef int             Int32;
-typedef unsigned int    UInt32;
-typedef short           Int16;
-typedef unsigned short  UInt16;
-
-#define True  ((Bool)1)
-#define False ((Bool)0)
 
 #ifndef __GNUC__
 #define __inline__  /* */
@@ -126,11 +117,11 @@ extern void bz_internal_error ( int errcode );
 
 /*-- Stuff for randomising repetitive blocks. --*/
 
-extern Int32 BZ2_rNums[512];
+extern const int32_t BZ2_rNums[512];
 
 #define BZ_RAND_DECLS                          \
-   Int32 rNToGo;                               \
-   Int32 rTPos                                 \
+   int32_t rNToGo;                             \
+   int32_t rTPos                               \
 
 #define BZ_RAND_INIT_MASK                      \
    s->rNToGo = 0;                              \
@@ -150,7 +141,7 @@ extern Int32 BZ2_rNums[512];
 
 /*-- Stuff for doing CRCs. --*/
 
-extern UInt32 BZ2_crc32Table[256];
+extern const uint32_t BZ2_crc32Table[256];
 
 #define BZ_INITIALISE_CRC(crcVar)              \
 {                                              \
@@ -166,7 +157,7 @@ extern UInt32 BZ2_crc32Table[256];
 {                                              \
    crcVar = (crcVar << 8) ^                    \
             BZ2_crc32Table[(crcVar >> 24) ^    \
-                           ((UChar)cha)];      \
+                           ((uint8_t)cha)];    \
 }
 
 
@@ -198,67 +189,67 @@ typedef
 
       /* mode this stream is in, and whether inputting */
       /* or outputting data */
-      Int32    mode;
-      Int32    state;
+      int32_t    mode;
+      int32_t    state;
 
       /* remembers avail_in when flush/finish requested */
-      UInt32   avail_in_expect;
+      uint32_t   avail_in_expect;
 
       /* for doing the block sorting */
-      UInt32*  arr1;
-      UInt32*  arr2;
-      UInt32*  ftab;
-      Int32    origPtr;
+      uint32_t*  arr1;
+      uint32_t*  arr2;
+      uint32_t*  ftab;
+      int32_t    origPtr;
 
       /* aliases for arr1 and arr2 */
-      UInt32*  ptr;
-      UChar*   block;
-      UInt16*  mtfv;
-      UChar*   zbits;
+      uint32_t*  ptr;
+      uint8_t*   block;
+      uint16_t*  mtfv;
+      uint8_t*   zbits;
 
       /* for deciding when to use the fallback sorting algorithm */
-      Int32    workFactor;
+      int32_t    workFactor;
 
       /* run-length-encoding of the input */
-      UInt32   state_in_ch;
-      Int32    state_in_len;
+      uint32_t   state_in_ch;
+      int32_t    state_in_len;
       BZ_RAND_DECLS;
 
       /* input and output limits and current posns */
-      Int32    nblock;
-      Int32    nblockMAX;
-      Int32    numZ;
-      Int32    state_out_pos;
+      int32_t    nblock;
+      int32_t    nblockMAX;
+      int32_t    numZ;
+      int32_t    state_out_pos;
 
       /* map of bytes used in block */
-      Int32    nInUse;
-      Bool     inUse[256];
-      UChar    unseqToSeq[256];
+      int32_t    nInUse;
+      bool       inUse[256];
+      uint8_t    unseqToSeq[256];
 
       /* the buffer for bit stream creation */
-      UInt32   bsBuff;
-      Int32    bsLive;
+      uint32_t   bsBuff;
+      int32_t    bsLive;
 
       /* block and combined CRCs */
-      UInt32   blockCRC;
-      UInt32   combinedCRC;
+      uint32_t   blockCRC;
+      uint32_t   combinedCRC;
 
       /* misc administratium */
-      Int32    verbosity;
-      Int32    blockNo;
-      Int32    blockSize100k;
+      int32_t    verbosity;
+      int32_t    blockNo;
+      int32_t    blockSize100k;
 
       /* stuff for coding the MTF values */
-      Int32    nMTF;
-      Int32    mtfFreq    [BZ_MAX_ALPHA_SIZE];
-      UChar    selector   [BZ_MAX_SELECTORS];
-      UChar    selectorMtf[BZ_MAX_SELECTORS];
+      int32_t    nMTF;
+      int32_t    mtfFreq    [BZ_MAX_ALPHA_SIZE];
+      uint8_t    selector   [BZ_MAX_SELECTORS];
+      uint8_t    selectorMtf[BZ_MAX_SELECTORS];
 
-      UChar    len     [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
-      Int32    code    [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
-      Int32    rfreq   [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
+      uint8_t    len     [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
+      int32_t    code    [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
+      int32_t    rfreq   [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
       /* second dimension: only 3 needed; 4 makes index calculations faster */
-      UInt32   len_pack[BZ_MAX_ALPHA_SIZE][4];
+      uint32_t   len_pack[BZ_MAX_ALPHA_SIZE][4];
 
    }
    EState;
@@ -271,16 +262,16 @@ extern void
 BZ2_blockSort ( EState* );
 
 extern void
-BZ2_compressBlock ( EState*, Bool );
+BZ2_compressBlock ( EState*, bool );
 
 extern void
 BZ2_bsInitWrite ( EState* );
 
 extern void
-BZ2_hbAssignCodes ( Int32*, UChar*, Int32, Int32, Int32 );
+BZ2_hbAssignCodes ( int32_t*, uint8_t*, int32_t, int32_t, int32_t );
 
 extern void
-BZ2_hbMakeCodeLengths ( UChar*, Int32*, Int32, Int32 );
+BZ2_hbMakeCodeLengths ( uint8_t*, int32_t*, int32_t, int32_t );
 
 
 
@@ -348,89 +339,89 @@ typedef
       bz_stream* strm;
 
       /* state indicator for this stream */
-      Int32    state;
+      int32_t    state;
 
       /* for doing the final run-length decoding */
-      UChar    state_out_ch;
-      Int32    state_out_len;
-      Bool     blockRandomised;
+      uint8_t    state_out_ch;
+      int32_t    state_out_len;
+      bool       blockRandomised;
       BZ_RAND_DECLS;
 
       /* the buffer for bit stream reading */
-      UInt32   bsBuff;
-      Int32    bsLive;
+      uint32_t   bsBuff;
+      int32_t    bsLive;
 
       /* misc administratium */
-      Int32    blockSize100k;
-      Bool     smallDecompress;
-      Int32    currBlockNo;
-      Int32    verbosity;
+      int32_t    blockSize100k;
+      bool       smallDecompress;
+      int32_t    currBlockNo;
+      int32_t    verbosity;
 
       /* for undoing the Burrows-Wheeler transform */
-      Int32    origPtr;
-      UInt32   tPos;
-      Int32    k0;
-      Int32    unzftab[256];
-      Int32    nblock_used;
-      Int32    cftab[257];
-      Int32    cftabCopy[257];
+      int32_t    origPtr;
+      uint32_t   tPos;
+      int32_t    k0;
+      int32_t    unzftab[256];
+      int32_t    nblock_used;
+      int32_t    cftab[257];
+      int32_t    cftabCopy[257];
 
       /* for undoing the Burrows-Wheeler transform (FAST) */
-      UInt32   *tt;
+      uint32_t*  tt;
 
       /* for undoing the Burrows-Wheeler transform (SMALL) */
-      UInt16   *ll16;
-      UChar    *ll4;
+      uint16_t*  ll16;
+      uint8_t*   ll4;
 
       /* stored and calculated CRCs */
-      UInt32   storedBlockCRC;
-      UInt32   storedCombinedCRC;
-      UInt32   calculatedBlockCRC;
-      UInt32   calculatedCombinedCRC;
+      uint32_t   storedBlockCRC;
+      uint32_t   storedCombinedCRC;
+      uint32_t   calculatedBlockCRC;
+      uint32_t   calculatedCombinedCRC;
 
       /* map of bytes used in block */
-      Int32    nInUse;
-      Bool     inUse[256];
-      Bool     inUse16[16];
-      UChar    seqToUnseq[256];
+      int32_t    nInUse;
+      bool       inUse[256];
+      bool       inUse16[16];
+      uint8_t    seqToUnseq[256];
 
       /* for decoding the MTF values */
-      UChar    mtfa   [MTFA_SIZE];
-      Int32    mtfbase[256 / MTFL_SIZE];
-      UChar    selector   [BZ_MAX_SELECTORS];
-      UChar    selectorMtf[BZ_MAX_SELECTORS];
-      UChar    len  [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
+      uint8_t    mtfa   [MTFA_SIZE];
+      int32_t    mtfbase[256 / MTFL_SIZE];
+      uint8_t    selector   [BZ_MAX_SELECTORS];
+      uint8_t    selectorMtf[BZ_MAX_SELECTORS];
+      uint8_t    len  [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
 
-      Int32    limit  [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
-      Int32    base   [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
-      Int32    perm   [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
-      Int32    minLens[BZ_N_GROUPS];
+      int32_t    limit  [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
+      int32_t    base   [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
+      int32_t    perm   [BZ_N_GROUPS][BZ_MAX_ALPHA_SIZE];
+      int32_t    minLens[BZ_N_GROUPS];
 
       /* save area for scalars in the main decompress code */
-      Int32    save_i;
-      Int32    save_j;
-      Int32    save_t;
-      Int32    save_alphaSize;
-      Int32    save_nGroups;
-      Int32    save_nSelectors;
-      Int32    save_EOB;
-      Int32    save_groupNo;
-      Int32    save_groupPos;
-      Int32    save_nextSym;
-      Int32    save_nblockMAX;
-      Int32    save_nblock;
-      Int32    save_es;
-      Int32    save_N;
-      Int32    save_curr;
-      Int32    save_zt;
-      Int32    save_zn;
-      Int32    save_zvec;
-      Int32    save_zj;
-      Int32    save_gSel;
-      Int32    save_gMinlen;
-      Int32*   save_gLimit;
-      Int32*   save_gBase;
-      Int32*   save_gPerm;
+      int32_t    save_i;
+      int32_t    save_j;
+      int32_t    save_t;
+      int32_t    save_alphaSize;
+      int32_t    save_nGroups;
+      int32_t    save_nSelectors;
+      int32_t    save_EOB;
+      int32_t    save_groupNo;
+      int32_t    save_groupPos;
+      int32_t    save_nextSym;
+      int32_t    save_nblockMAX;
+      int32_t    save_nblock;
+      int32_t    save_es;
+      int32_t    save_N;
+      int32_t    save_curr;
+      int32_t    save_zt;
+      int32_t    save_zn;
+      int32_t    save_zvec;
+      int32_t    save_zj;
+      int32_t    save_gSel;
+      int32_t    save_gMinlen;
+      int32_t*   save_gLimit;
+      int32_t*   save_gBase;
+      int32_t*   save_gPerm;
 
    }
    DState;
@@ -441,16 +432,16 @@ typedef
 
 #define BZ_GET_FAST(cccc)                     \
     /* c_tPos is unsigned, hence test < 0 is pointless. */ \
-    if (s->tPos >= (UInt32)100000 * (UInt32)s->blockSize100k) return True; \
+    if (s->tPos >= (uint32_t)100000 * (uint32_t)s->blockSize100k) return true; \
     s->tPos = s->tt[s->tPos];                 \
-    cccc = (UChar)(s->tPos & 0xff);           \
+    cccc = (uint8_t)(s->tPos & 0xff);           \
     s->tPos >>= 8;
 
 #define BZ_GET_FAST_C(cccc)                   \
     /* c_tPos is unsigned, hence test < 0 is pointless. */ \
-    if (c_tPos >= (UInt32)100000 * (UInt32)ro_blockSize100k) return True; \
+    if (c_tPos >= (uint32_t)100000 * (uint32_t)ro_blockSize100k) return true; \
     c_tPos = c_tt[c_tPos];                    \
-    cccc = (UChar)(c_tPos & 0xff);            \
+    cccc = (uint8_t)(c_tPos & 0xff);            \
     c_tPos >>= 8;
 
 #define SET_LL4(i,n)                                          \
@@ -460,34 +451,34 @@ typedef
    }
 
 #define GET_LL4(i)                             \
-   ((((UInt32)(s->ll4[(i) >> 1])) >> (((i) << 2) & 0x4)) & 0xF)
+   ((((uint32_t)(s->ll4[(i) >> 1])) >> (((i) << 2) & 0x4)) & 0xF)
 
 #define SET_LL(i,n)                          \
-   { s->ll16[i] = (UInt16)(n & 0x0000ffff);  \
+   { s->ll16[i] = (uint16_t)(n & 0x0000ffff);  \
      SET_LL4(i, n >> 16);                    \
    }
 
 #define GET_LL(i) \
-   (((UInt32)s->ll16[i]) | (GET_LL4(i) << 16))
+   (((uint32_t)s->ll16[i]) | (GET_LL4(i) << 16))
 
 #define BZ_GET_SMALL(cccc)                            \
     /* c_tPos is unsigned, hence test < 0 is pointless. */ \
-    if (s->tPos >= (UInt32)100000 * (UInt32)s->blockSize100k) return True; \
+    if (s->tPos >= (uint32_t)100000 * (uint32_t)s->blockSize100k) return true; \
     cccc = BZ2_indexIntoF ( s->tPos, s->cftab );    \
     s->tPos = GET_LL(s->tPos);
 
 
 /*-- externs for decompression. --*/
 
-extern Int32
-BZ2_indexIntoF ( Int32, Int32* );
+extern int32_t
+BZ2_indexIntoF ( int32_t, int32_t* );
 
-extern Int32
+extern int32_t
 BZ2_decompress ( DState* );
 
 extern void
-BZ2_hbCreateDecodeTables ( Int32*, Int32*, Int32*, UChar*,
-                           Int32,  Int32, Int32 );
+BZ2_hbCreateDecodeTables ( int32_t*, int32_t*, int32_t*, uint8_t*,
+                           int32_t,  int32_t, int32_t );
 
 
 #endif

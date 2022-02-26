@@ -32,7 +32,7 @@
 
 #define UPHEAP(z)                                     \
 {                                                     \
-   Int32 zz, tmp;                                     \
+   int32_t zz, tmp;                                   \
    zz = z; tmp = heap[zz];                            \
    while (weight[tmp] < weight[heap[zz >> 1]]) {      \
       heap[zz] = heap[zz >> 1];                       \
@@ -43,9 +43,9 @@
 
 #define DOWNHEAP(z)                                   \
 {                                                     \
-   Int32 zz, yy, tmp;                                 \
+   int32_t zz, yy, tmp;                               \
    zz = z; tmp = heap[zz];                            \
-   while (True) {                                     \
+   while (true) {                                     \
       yy = zz << 1;                                   \
       if (yy > nHeap) break;                          \
       if (yy < nHeap &&                               \
@@ -60,26 +60,26 @@
 
 
 /*---------------------------------------------------*/
-void BZ2_hbMakeCodeLengths ( UChar *len,
-                             Int32 *freq,
-                             Int32 alphaSize,
-                             Int32 maxLen )
+void BZ2_hbMakeCodeLengths ( uint8_t* len,
+                             int32_t* freq,
+                             int32_t  alphaSize,
+                             int32_t  maxLen )
 {
    /*--
       Nodes and heap entries run from 1.  Entry 0
       for both the heap and nodes is a sentinel.
    --*/
-   Int32 nNodes, nHeap, n1, n2, i, j, k;
-   Bool  tooLong;
+   int32_t nNodes, nHeap, n1, n2, i, j, k;
+   bool    tooLong;
 
-   Int32 heap   [ BZ_MAX_ALPHA_SIZE + 2 ];
-   Int32 weight [ BZ_MAX_ALPHA_SIZE * 2 ];
-   Int32 parent [ BZ_MAX_ALPHA_SIZE * 2 ];
+   int32_t heap   [ BZ_MAX_ALPHA_SIZE + 2 ];
+   int32_t weight [ BZ_MAX_ALPHA_SIZE * 2 ];
+   int32_t parent [ BZ_MAX_ALPHA_SIZE * 2 ];
 
    for (i = 0; i < alphaSize; i++)
       weight[i+1] = (freq[i] == 0 ? 1 : freq[i]) << 8;
 
-   while (True) {
+   while (true) {
 
       nNodes = alphaSize;
       nHeap = 0;
@@ -111,13 +111,13 @@ void BZ2_hbMakeCodeLengths ( UChar *len,
 
       AssertH( nNodes < (BZ_MAX_ALPHA_SIZE * 2), 2002 );
 
-      tooLong = False;
+      tooLong = false;
       for (i = 1; i <= alphaSize; i++) {
          j = 0;
          k = i;
          while (parent[k] >= 0) { k = parent[k]; j++; }
          len[i-1] = j;
-         if (j > maxLen) tooLong = True;
+         if (j > maxLen) tooLong = true;
       }
 
       if (! tooLong) break;
@@ -149,13 +149,13 @@ void BZ2_hbMakeCodeLengths ( UChar *len,
 
 
 /*---------------------------------------------------*/
-void BZ2_hbAssignCodes ( Int32 *code,
-                         UChar *length,
-                         Int32 minLen,
-                         Int32 maxLen,
-                         Int32 alphaSize )
+void BZ2_hbAssignCodes ( int32_t* code,
+                         uint8_t* length,
+                         int32_t  minLen,
+                         int32_t  maxLen,
+                         int32_t  alphaSize )
 {
-   Int32 n, vec, i;
+   int32_t n, vec, i;
 
    vec = 0;
    for (n = minLen; n <= maxLen; n++) {
@@ -167,15 +167,15 @@ void BZ2_hbAssignCodes ( Int32 *code,
 
 
 /*---------------------------------------------------*/
-void BZ2_hbCreateDecodeTables ( Int32 *limit,
-                                Int32 *base,
-                                Int32 *perm,
-                                UChar *length,
-                                Int32 minLen,
-                                Int32 maxLen,
-                                Int32 alphaSize )
+void BZ2_hbCreateDecodeTables ( int32_t* limit,
+                                int32_t* base,
+                                int32_t* perm,
+                                uint8_t* length,
+                                int32_t  minLen,
+                                int32_t  maxLen,
+                                int32_t  alphaSize )
 {
-   Int32 pp, i, j, vec;
+   int32_t pp, i, j, vec;
 
    pp = 0;
    for (i = minLen; i <= maxLen; i++)
