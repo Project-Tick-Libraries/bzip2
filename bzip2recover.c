@@ -383,8 +383,8 @@ int main ( int argc, char** argv )
             (bitsRead - bStart[currBlock]) >= 40) {
             bEnd[currBlock] = bitsRead-1;
             if (currBlock > 0)
-               fprintf ( stderr, "   block %d runs from " PRIu64
-                                 " to " PRIu64 " (incomplete)\n",
+               fprintf ( stderr, "   block %d runs from %" PRIu64
+                                 " to %" PRIu64 " (incomplete)\n",
                          currBlock,  bStart[currBlock], bEnd[currBlock] );
          } else
             currBlock--;
@@ -405,8 +405,8 @@ int main ( int argc, char** argv )
          }
          if (currBlock > 0 &&
              (bEnd[currBlock] - bStart[currBlock]) >= 130) {
-            fprintf ( stderr, "   block %d runs from " PRIu64
-                              " to " PRIu64 "\n",
+            fprintf ( stderr, "   block %d runs from %" PRIu64
+                              " to %" PRIu64 "\n",
                       rbCtr+1,  bStart[currBlock], bEnd[currBlock] );
             rbStart[rbCtr] = bStart[currBlock];
             rbEnd[rbCtr] = bEnd[currBlock];

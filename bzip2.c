@@ -199,9 +199,9 @@ void uInt64_from_UInt32s ( uint64_t* n, uint32_t lo32, uint32_t hi32 )
 
 /* Divide *n by 10, and return the remainder.  */
 static
-int8_t uInt64_qrm10 ( uint64_t* n )
+char uInt64_qrm10 ( uint64_t* n )
 {
-   int8_t rem = (int8_t)(*n % UINT64_C(10));
+   char rem = (int8_t)(*n % UINT64_C(10));
    *n /= UINT64_C(10);
    return rem;
 }
@@ -1701,12 +1701,12 @@ void addFlagsFromEnvVar ( Cell** argList, const char* varName )
 /*---------------------------------------------*/
 #define ISFLAG(s) (strcmp(aa->name, (s))==0)
 
-int main ( int argc, char* argv[] )
+int main ( int argc, char *argv[] )
 {
    int32_t  i, j;
-   char*    tmp;
-   Cell*    argList;
-   Cell*    aa;
+   char    *tmp;
+   Cell    *argList;
+   Cell    *aa;
    bool     decode;
 
    /*-- Be really really really paranoid :-) --*/

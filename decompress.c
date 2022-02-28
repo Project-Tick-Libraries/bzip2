@@ -44,7 +44,7 @@ void makeMaps_d ( DState* s )
    case lll: s->state = lll;                      \
    while (true) {                                 \
       if (s->bsLive >= nnn) {                     \
-         uint32_t v;                                \
+         uint32_t v;                              \
          v = (s->bsBuff >>                        \
              (s->bsLive-nnn)) & ((1 << nnn)-1);   \
          s->bsLive -= nnn;                        \
@@ -54,8 +54,8 @@ void makeMaps_d ( DState* s )
       if (s->strm->avail_in == 0) RETURN(BZ_OK);  \
       s->bsBuff                                   \
          = (s->bsBuff << 8) |                     \
-           ((uint32_t)                              \
-              (*((uint8_t*)(s->strm->next_in))));   \
+           ((uint32_t)                            \
+              (*((uint8_t*)(s->strm->next_in)))); \
       s->bsLive += 8;                             \
       s->strm->next_in++;                         \
       s->strm->avail_in--;                        \
@@ -87,7 +87,7 @@ void makeMaps_d ( DState* s )
    groupPos--;                                    \
    zn = gMinlen;                                  \
    GET_BITS(label1, zvec, zn);                    \
-   while (true) {                                    \
+   while (true) {                                 \
       if (zn > 20 /* the longest code */)         \
          RETURN(BZ_DATA_ERROR);                   \
       if (zvec <= gLimit[zn]) break;              \

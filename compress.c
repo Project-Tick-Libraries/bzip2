@@ -59,7 +59,7 @@ void bsFinishWrite ( EState* s )
 {                                             \
    while (s->bsLive >= 8) {                   \
       s->zbits[s->numZ]                       \
-         = (uint8_t)(s->bsBuff >> 24);          \
+         = (uint8_t)(s->bsBuff >> 24);        \
       s->numZ++;                              \
       s->bsBuff <<= 8;                        \
       s->bsLive -= 8;                         \
