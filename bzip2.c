@@ -201,7 +201,7 @@ void uInt64_from_UInt32s ( uint64_t* n, uint32_t lo32, uint32_t hi32 )
 static
 char uInt64_qrm10 ( uint64_t* n )
 {
-   char rem = (int8_t)(*n % UINT64_C(10));
+   char rem = (char)(*n % UINT64_C(10));
    *n /= UINT64_C(10);
    return rem;
 }
