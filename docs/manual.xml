@@ -2673,19 +2673,6 @@ complexity.</para>
 program under Unix straight out-of-the-box, so to speak,
 especially if you have a version of GNU C available.</para>
 
-<para>There are a couple of
-<computeroutput>__inline__</computeroutput> directives in the
-code.  GNU C (<computeroutput>gcc</computeroutput>) should be
-able to handle them.  If you're not using GNU C, your C compiler
-shouldn't see them at all.  If your compiler does, for some
-reason, see them and doesn't like them, just
-<computeroutput>#define</computeroutput>
-<computeroutput>__inline__</computeroutput> to be
-<computeroutput>/* */</computeroutput>.  One easy way to do this
-is to compile with the flag
-<computeroutput>-D__inline__=</computeroutput>, which should be
-understood by most Unix compilers.</para>
-
 <para>If you still have difficulties, try compiling with the
 macro <computeroutput>BZ_STRICT_ANSI</computeroutput> defined.
 This should enable you to build the library in a strictly ANSI

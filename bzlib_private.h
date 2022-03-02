@@ -38,10 +38,6 @@
 
 /*-- General stuff. --*/
 
-#ifndef __GNUC__
-#define __inline__  /* */
-#endif
-
 #ifndef BZ_NO_STDIO
 
 extern void BZ2_bz__AssertH__fail ( int errcode );
@@ -59,31 +55,15 @@ extern void BZ2_bz__AssertH__fail ( int errcode );
 #define AssertD(cond,msg) /* */
 #endif
 
-#define VPrintf0(zf) \
-   fprintf(stderr,zf)
-#define VPrintf1(zf,za1) \
-   fprintf(stderr,zf,za1)
-#define VPrintf2(zf,za1,za2) \
-   fprintf(stderr,zf,za1,za2)
-#define VPrintf3(zf,za1,za2,za3) \
-   fprintf(stderr,zf,za1,za2,za3)
-#define VPrintf4(zf,za1,za2,za3,za4) \
-   fprintf(stderr,zf,za1,za2,za3,za4)
-#define VPrintf5(zf,za1,za2,za3,za4,za5) \
-   fprintf(stderr,zf,za1,za2,za3,za4,za5)
+#define VPrintf(...)  fprintf(stderr,__VA_ARGS__)
 
 #else
 
 extern void bz_internal_error ( int errcode );
 #define AssertH(cond,errcode) \
    { if (!(cond)) bz_internal_error ( errcode ); }
-#define AssertD(cond,msg)                do { } while (0)
-#define VPrintf0(zf)                     do { } while (0)
-#define VPrintf1(zf,za1)                 do { } while (0)
-#define VPrintf2(zf,za1,za2)             do { } while (0)
-#define VPrintf3(zf,za1,za2,za3)         do { } while (0)
-#define VPrintf4(zf,za1,za2,za3,za4)     do { } while (0)
-#define VPrintf5(zf,za1,za2,za3,za4,za5) do { } while (0)
+#define AssertD(cond,msg)  do { } while (false)
+#define VPrintf(...)       do { } while (false)
 
 #endif
 

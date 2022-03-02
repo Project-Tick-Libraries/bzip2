@@ -28,7 +28,7 @@
 
 /*---------------------------------------------*/
 static
-__inline__
+inline
 void fallbackSimpleSort ( uint32_t* fmap,
                           uint32_t* eclass,
                           int32_t   lo,
@@ -227,7 +227,7 @@ void fallbackSort ( uint32_t* fmap,
       initial fmap and initial BH bits.
    --*/
    if (verb >= 4)
-      VPrintf0 ( "        bucket sorting ...\n" );
+      VPrintf ( "        bucket sorting ...\n" );
    for (i = 0; i < 257;    i++) ftab[i] = 0;
    for (i = 0; i < nblock; i++) ftab[eclass8[i]]++;
    for (i = 0; i < 256;    i++) ftabCopy[i] = ftab[i];
@@ -261,7 +261,7 @@ void fallbackSort ( uint32_t* fmap,
    while (true) {
 
       if (verb >= 4)
-         VPrintf1 ( "        depth %6d has ", H );
+         VPrintf ( "        depth %6d has ", H );
 
       j = 0;
       for (i = 0; i < nblock; i++) {
@@ -306,7 +306,7 @@ void fallbackSort ( uint32_t* fmap,
       }
 
       if (verb >= 4)
-         VPrintf1 ( "%6d unresolved strings\n", nNotDone );
+         VPrintf ( "%6d unresolved strings\n", nNotDone );
 
       H *= 2;
       if (H > nblock || nNotDone == 0) break;
@@ -318,7 +318,7 @@ void fallbackSort ( uint32_t* fmap,
       previous phase destroyed it.
    --*/
    if (verb >= 4)
-      VPrintf0 ( "        reconstructing block ...\n" );
+      VPrintf ( "        reconstructing block ...\n" );
    j = 0;
    for (i = 0; i < nblock; i++) {
       while (ftabCopy[j] == 0) j++;
@@ -343,7 +343,7 @@ void fallbackSort ( uint32_t* fmap,
 
 /*---------------------------------------------*/
 static
-__inline__
+inline
 bool mainGtU ( uint32_t  i1,
                uint32_t  i2,
                uint8_t*  block,
@@ -579,7 +579,7 @@ void mainSimpleSort ( uint32_t* ptr,
 }
 
 static
-__inline__
+inline
 uint8_t mmed3 ( uint8_t a, uint8_t b, uint8_t c )
 {
    uint8_t t;
@@ -764,7 +764,7 @@ void mainSort ( uint32_t* ptr,
    uint8_t  c1;
    int32_t  numQSorted;
    uint16_t s;
-   if (verb >= 4) VPrintf0 ( "        main sort initialise ...\n" );
+   if (verb >= 4) VPrintf ( "        main sort initialise ...\n" );
 
    /*-- set up the 2-byte frequency table --*/
    for (i = 65536; i >= 0; i--) ftab[i] = 0;
@@ -797,7 +797,7 @@ void mainSort ( uint32_t* ptr,
       quadrant[nblock+i] = 0;
    }
 
-   if (verb >= 4) VPrintf0 ( "        bucket sorting ...\n" );
+   if (verb >= 4) VPrintf ( "        bucket sorting ...\n" );
 
    /*-- Complete the initial radix sort --*/
    for (i = 1; i <= 65536; i++) ftab[i] += ftab[i-1];
@@ -891,7 +891,7 @@ void mainSort ( uint32_t* ptr,
                int32_t hi = (ftab[sb+1] & CLEARMASK) - 1;
                if (hi > lo) {
                   if (verb >= 4)
-                     VPrintf4 ( "        qsort [0x%x, 0x%x]   "
+                     VPrintf ( "        qsort [0x%x, 0x%x]   "
                                 "done %d   this %d\n",
                                 ss, j, numQSorted, hi - lo + 1 );
                   mainQSort3 (
@@ -1006,7 +1006,7 @@ void mainSort ( uint32_t* ptr,
    }
 
    if (verb >= 4)
-      VPrintf3 ( "        %d pointers, %d sorted, %d scanned\n",
+      VPrintf ( "        %d pointers, %d sorted, %d scanned\n",
                  nblock, numQSorted, nblock - numQSorted );
 }
 
@@ -1067,14 +1067,14 @@ void BZ2_blockSort ( EState* s )
 
       mainSort ( ptr, block, quadrant, ftab, nblock, verb, &budget );
       if (verb >= 3)
-         VPrintf3 ( "      %d work, %d block, ratio %5.2f\n",
+         VPrintf ( "      %d work, %d block, ratio %5.2f\n",
                     budgetInit - budget,
                     nblock,
                     (float)(budgetInit - budget) /
                     (float)(nblock==0 ? 1 : nblock) );
       if (budget < 0) {
          if (verb >= 2)
-            VPrintf0 ( "    too repetitive; using fallback"
+            VPrintf ( "    too repetitive; using fallback"
                        " sorting algorithm\n" );
          fallbackSort ( s->arr1, s->arr2, ftab, nblock, verb );
       }

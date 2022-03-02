@@ -686,7 +686,7 @@ bool unRLE_obuf_to_output_FAST ( DState* s )
 
 
 /*---------------------------------------------------*/
-__inline__ int32_t BZ2_indexIntoF ( int32_t indx, int32_t *cftab )
+inline int32_t BZ2_indexIntoF ( int32_t indx, int32_t *cftab )
 {
    int32_t nb, na, mid;
    nb = 0;
@@ -826,9 +826,9 @@ int BZ_API(BZ2_bzDecompress) ( bz_stream* strm )
          if (s->nblock_used == s->save_nblock+1 && s->state_out_len == 0) {
             BZ_FINALISE_CRC ( s->calculatedBlockCRC );
             if (s->verbosity >= 3)
-               VPrintf2 ( " {0x%08x, 0x%08x}", s->storedBlockCRC,
+               VPrintf ( " {0x%08x, 0x%08x}", s->storedBlockCRC,
                           s->calculatedBlockCRC );
-            if (s->verbosity >= 2) VPrintf0 ( "]" );
+            if (s->verbosity >= 2) VPrintf ( "]" );
             if (s->calculatedBlockCRC != s->storedBlockCRC)
                return BZ_DATA_ERROR;
             s->calculatedCombinedCRC
@@ -844,7 +844,7 @@ int BZ_API(BZ2_bzDecompress) ( bz_stream* strm )
          int32_t r = BZ2_decompress ( s );
          if (r == BZ_STREAM_END) {
             if (s->verbosity >= 3)
-               VPrintf2 ( "\n    combined CRCs: stored = 0x%08x, computed = 0x%08x",
+               VPrintf ( "\n    combined CRCs: stored = 0x%08x, computed = 0x%08x",
                           s->storedCombinedCRC, s->calculatedCombinedCRC );
             if (s->calculatedCombinedCRC != s->storedCombinedCRC)
                return BZ_DATA_ERROR;
