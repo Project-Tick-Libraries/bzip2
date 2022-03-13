@@ -327,6 +327,7 @@ if(ENABLE_SHARED_LIB)
                 PUBLIC    ${CMAKE_CURRENT_SOURCE_DIR}/bzlib_private.h
                 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h
             )
+            set_property(TARGET bz2_old_soname PROPERTY C_STANDARD 99)
             set_target_properties(bz2_old_soname PROPERTIES
                 COMPILE_FLAGS "${WARNCFLAGS}"
                 VERSION ${LT_SOVERSION}.${LT_AGE} SOVERSION ${LT_SOVERSION}.${LT_AGE}
