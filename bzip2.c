@@ -193,7 +193,7 @@ static void    applySavedFileAttrToOutputFile ( int fd );
 static
 void uInt64_from_UInt32s ( uint64_t* n, uint32_t lo32, uint32_t hi32 )
 {
-   *n = ((uint64_t)hi32 << 32) & (uint64_t)lo32;
+   *n = ((uint64_t)hi32 << 32) | (uint64_t)lo32;
 }
 
 
