@@ -13,6 +13,9 @@ set(LT_CURRENT  1)
 set(LT_REVISION 9)
 set(LT_AGE      0)
 
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED TRUE)
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 include(Version)
 include(SymLink)
@@ -285,7 +288,6 @@ target_sources(bz2_ObjLib
     PRIVATE   ${BZ2_SOURCES}
     PUBLIC    ${CMAKE_CURRENT_SOURCE_DIR}/bzlib_private.h
     INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h)
-set_property(TARGET bz2_ObjLib PROPERTY C_STANDARD 99)
 
 # Windows resource file
 set(BZ2_RES "")
@@ -308,7 +310,6 @@ if(ENABLE_SHARED_LIB)
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h)
     # Always use '-fPIC'/'-fPIE' option for shared libraries.
     set_property(TARGET bz2 PROPERTY POSITION_INDEPENDENT_CODE ON)
-    set_property(TARGET bz2 PROPERTY C_STANDARD 99)
     set_target_properties(bz2 PROPERTIES
         COMPILE_FLAGS "${WARNCFLAGS}"
         VERSION ${LT_VERSION} SOVERSION ${LT_SOVERSION})
@@ -327,7 +328,6 @@ if(ENABLE_SHARED_LIB)
                 PUBLIC    ${CMAKE_CURRENT_SOURCE_DIR}/bzlib_private.h
                 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h
             )
-            set_property(TARGET bz2_old_soname PROPERTY C_STANDARD 99)
             set_target_properties(bz2_old_soname PROPERTIES
                 COMPILE_FLAGS "${WARNCFLAGS}"
                 VERSION ${LT_SOVERSION}.${LT_AGE} SOVERSION ${LT_SOVERSION}.${LT_AGE}
@@ -345,7 +345,6 @@ if(ENABLE_STATIC_LIB)
         PRIVATE     ${BZ2_SOURCES}
         PUBLIC      ${CMAKE_CURRENT_SOURCE_DIR}/bzlib_private.h
         INTERFACE   ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h)
-    set_property(TARGET bz2_static PROPERTY C_STANDARD 99)
     set_target_properties(bz2_static PROPERTIES
         COMPILE_FLAGS       "${WARNCFLAGS}"
         VERSION             ${LT_VERSION}
@@ -361,7 +360,6 @@ if(ENABLE_APP)
     add_executable(bzip2)
     target_sources(bzip2
         PRIVATE   bzip2.c)
-    set_property(TARGET bzip2 PROPERTY C_STANDARD 99)
     target_link_libraries(bzip2
         PRIVATE   bz2_ObjLib)
     if(WIN32)
@@ -382,7 +380,6 @@ if(ENABLE_APP)
         PRIVATE   bzip2recover.c)
     target_link_libraries(bzip2recover
         PRIVATE bz2_ObjLib)
-    set_property(TARGET bzip2recover PROPERTY C_STANDARD 99)
     if(WIN32)
         target_compile_definitions(bzip2recover PUBLIC BZ_LCCWIN32 BZ_UNIX=0)
     else()
