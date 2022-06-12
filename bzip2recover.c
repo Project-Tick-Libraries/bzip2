@@ -329,24 +329,8 @@ int main ( int argc, char** argv )
    if (argc != 2) {
       fprintf ( stderr, "%s: usage is `%s damaged_file_name'.\n",
                         progName, progName );
-      switch (sizeof(uint64_t)) {
-         case 8:
-            fprintf(stderr,
-                    "\trestrictions on size of recovered file: None\n");
-            break;
-         case 4:
-            fprintf(stderr,
-                    "\trestrictions on size of recovered file: 512 MB\n");
-            fprintf(stderr,
-                    "\tto circumvent, recompile with uint64_t as an\n"
-                    "\tunsigned 64-bit int.\n");
-            break;
-         default:
-            fprintf(stderr,
-                    "\tsizeof(uint64_t) is not 4 or 8 -- "
-                    "configuration error.\n");
-            break;
-      }
+      fprintf ( stderr,
+               "\trestrictions on size of recovered file: None\n" );
       exit(1);
    }
 

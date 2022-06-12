@@ -913,8 +913,7 @@ bool notAStandardFile ( const char* name )
 
    i = MY_LSTAT ( name, &statBuf );
    if (i != 0) return true;
-   if (MY_S_ISREG(statBuf.st_mode)) return false;
-   return true;
+   return (MY_S_ISREG(statBuf.st_mode) == 0);
 }
 
 
@@ -1040,8 +1039,7 @@ bool hasSuffix ( const char* s, const char* suffix )
    int32_t ns = strlen(s);
    int32_t nx = strlen(suffix);
    if (ns < nx) return false;
-   if (strcmp(s + ns - nx, suffix) == 0) return true;
-   return false;
+   return (strcmp(s + ns - nx, suffix) == 0);
 }
 
 static

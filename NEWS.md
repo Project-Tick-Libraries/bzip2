@@ -429,7 +429,7 @@ error messages (internal panics) when an I/O error occurs, instead of
 reporting the problem correctly.  This shouldn't give any data loss
 (as far as I can see), but is confusing.
 
-Made the __inline__ declarations disappear for non-GCC compilers.
+Made the inline declarations disappear for non-GCC compilers.
 
 
 ## 0.9.0a
