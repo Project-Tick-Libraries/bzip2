@@ -68,8 +68,8 @@ extern void bz_internal_error ( int errcode );
 #endif
 
 
-#define BZALLOC(nnn) (strm->bzalloc)(strm->opaque,(nnn),1)
-#define BZFREE(ppp)  (strm->bzfree)(strm->opaque,(ppp))
+#define BZALLOC(nnn,sss) (strm->bzalloc)(strm->opaque,(nnn),(sss))
+#define BZFREE(ppp)      (strm->bzfree)(strm->opaque,(ppp))
 
 
 /*-- Header bytes. --*/
@@ -248,10 +248,10 @@ extern void
 BZ2_bsInitWrite ( EState* );
 
 extern void
-BZ2_hbAssignCodes ( int32_t*, uint8_t*, int32_t, int32_t, int32_t );
+BZ2_hbAssignCodes ( int32_t*, const uint8_t*, int32_t, int32_t, int32_t );
 
 extern void
-BZ2_hbMakeCodeLengths ( uint8_t*, int32_t*, int32_t, int32_t );
+BZ2_hbMakeCodeLengths ( uint8_t*, const int32_t*, int32_t, int32_t );
 
 
 
@@ -451,13 +451,13 @@ typedef
 /*-- externs for decompression. --*/
 
 extern int32_t
-BZ2_indexIntoF ( int32_t, int32_t* );
+BZ2_indexIntoF ( int32_t, const int32_t* );
 
 extern int32_t
 BZ2_decompress ( DState* );
 
 extern void
-BZ2_hbCreateDecodeTables ( int32_t*, int32_t*, int32_t*, uint8_t*,
+BZ2_hbCreateDecodeTables ( int32_t*, int32_t*, int32_t*, const uint8_t*,
                            int32_t,  int32_t, int32_t );
 
 

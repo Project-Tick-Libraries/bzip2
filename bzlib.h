@@ -59,7 +59,7 @@ typedef
 
       void *state;
 
-      void *(*bzalloc)(void *,int,int);
+      void *(*bzalloc)(void *,size_t,size_t);
       void (*bzfree)(void *,void *);
       void *opaque;
    }

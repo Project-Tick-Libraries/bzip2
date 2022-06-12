@@ -29,10 +29,10 @@
 /*---------------------------------------------*/
 static
 inline
-void fallbackSimpleSort ( uint32_t* fmap,
-                          uint32_t* eclass,
-                          int32_t   lo,
-                          int32_t   hi )
+void fallbackSimpleSort ( uint32_t*       fmap,
+                          const uint32_t* eclass,
+                          int32_t         lo,
+                          int32_t         hi )
 {
    int32_t  i, j, tmp;
    uint32_t ec_tmp;
@@ -90,10 +90,10 @@ void fallbackSimpleSort ( uint32_t* fmap,
 
 
 static
-void fallbackQSort3 ( uint32_t* fmap,
-                      uint32_t* eclass,
-                      int32_t   loSt,
-                      int32_t   hiSt )
+void fallbackQSort3 ( uint32_t*       fmap,
+                      const uint32_t* eclass,
+                      int32_t         loSt,
+                      int32_t         hiSt )
 {
    int32_t  unLo, unHi, ltLo, gtHi, n, m;
    int32_t  sp, lo, hi;
@@ -344,12 +344,12 @@ void fallbackSort ( uint32_t* fmap,
 /*---------------------------------------------*/
 static
 inline
-bool mainGtU ( uint32_t  i1,
-               uint32_t  i2,
-               uint8_t*  block,
-               uint16_t* quadrant,
-               uint32_t  nblock,
-               int32_t*  budget )
+bool mainGtU ( uint32_t        i1,
+               uint32_t        i2,
+               const uint8_t*  block,
+               const uint16_t* quadrant,
+               uint32_t        nblock,
+               int32_t*        budget )
 {
    int32_t  k;
    uint8_t  c1, c2;
@@ -482,14 +482,14 @@ const int32_t incs[14] = { 1, 4, 13, 40, 121, 364, 1093, 3280,
                            797161, 2391484 };
 
 static
-void mainSimpleSort ( uint32_t* ptr,
-                      uint8_t*  block,
-                      uint16_t* quadrant,
-                      int32_t   nblock,
-                      int32_t   lo,
-                      int32_t   hi,
-                      int32_t   d,
-                      int32_t*  budget )
+void mainSimpleSort ( uint32_t*       ptr,
+                      const uint8_t*  block,
+                      const uint16_t* quadrant,
+                      int32_t         nblock,
+                      int32_t         lo,
+                      int32_t         hi,
+                      int32_t         d,
+                      int32_t*        budget )
 {
    int32_t  i, j, h, bigN, hp;
    uint32_t v;
@@ -618,14 +618,14 @@ uint8_t mmed3 ( uint8_t a, uint8_t b, uint8_t c )
 #define MAIN_QSORT_STACK_SIZE 100
 
 static
-void mainQSort3 ( uint32_t* ptr,
-                  uint8_t*  block,
-                  uint16_t* quadrant,
-                  int32_t   nblock,
-                  int32_t   loSt,
-                  int32_t   hiSt,
-                  int32_t   dSt,
-                  int32_t*  budget )
+void mainQSort3 ( uint32_t*       ptr,
+                  const uint8_t*  block,
+                  const uint16_t* quadrant,
+                  int32_t         nblock,
+                  int32_t         loSt,
+                  int32_t         hiSt,
+                  int32_t         dSt,
+                  int32_t*        budget )
 {
    int32_t unLo, unHi, ltLo, gtHi, n, m, med;
    int32_t sp, lo, hi, d;

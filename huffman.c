@@ -60,10 +60,10 @@
 
 
 /*---------------------------------------------------*/
-void BZ2_hbMakeCodeLengths ( uint8_t* len,
-                             int32_t* freq,
-                             int32_t  alphaSize,
-                             int32_t  maxLen )
+void BZ2_hbMakeCodeLengths ( uint8_t*       len,
+                             const int32_t* freq,
+                             int32_t        alphaSize,
+                             int32_t        maxLen )
 {
    /*--
       Nodes and heap entries run from 1.  Entry 0
@@ -149,11 +149,11 @@ void BZ2_hbMakeCodeLengths ( uint8_t* len,
 
 
 /*---------------------------------------------------*/
-void BZ2_hbAssignCodes ( int32_t* code,
-                         uint8_t* length,
-                         int32_t  minLen,
-                         int32_t  maxLen,
-                         int32_t  alphaSize )
+void BZ2_hbAssignCodes ( int32_t*       code,
+                         const uint8_t* length,
+                         int32_t        minLen,
+                         int32_t        maxLen,
+                         int32_t        alphaSize )
 {
    int32_t n, vec, i;
 
@@ -167,13 +167,13 @@ void BZ2_hbAssignCodes ( int32_t* code,
 
 
 /*---------------------------------------------------*/
-void BZ2_hbCreateDecodeTables ( int32_t* limit,
-                                int32_t* base,
-                                int32_t* perm,
-                                uint8_t* length,
-                                int32_t  minLen,
-                                int32_t  maxLen,
-                                int32_t  alphaSize )
+void BZ2_hbCreateDecodeTables ( int32_t*       limit,
+                                int32_t*       base,
+                                int32_t*       perm,
+                                const uint8_t* length,
+                                int32_t        minLen,
+                                int32_t        maxLen,
+                                int32_t        alphaSize )
 {
    int32_t pp, i, j, vec;
 

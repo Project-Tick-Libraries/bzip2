@@ -813,7 +813,7 @@ void configError ( void )
 {
    fprintf ( stderr,
              "bzip2: I'm not configured correctly for this platform!\n"
-             "\tI require int32_t, int16_t and char to have sizes\n"
+             "\tI require int, short and char to have sizes\n"
              "\tof 4, 2 and 1 bytes to run properly, and they don't.\n"
              "\tProbably you can fix this by defining them correctly,\n"
              "\tand recompiling.  Bye!\n" );
@@ -1710,9 +1710,7 @@ int main ( int argc, char *argv[] )
    bool     decode;
 
    /*-- Be really really really paranoid :-) --*/
-   if (sizeof(int32_t) != 4 || sizeof(uint32_t) != 4  ||
-       sizeof(int16_t) != 2 || sizeof(uint16_t) != 2  ||
-       sizeof(char)  != 1 || sizeof(uint8_t)  != 1)
+   if (sizeof(int) != 4 || sizeof(short) != 2 || sizeof(char) != 1)
       configError();
 
    /*-- Initialise --*/

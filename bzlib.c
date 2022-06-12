@@ -90,21 +90,17 @@ void BZ2_bz__AssertH__fail ( int errcode )
 
 /*---------------------------------------------------*/
 static
-int bz_config_ok ( void )
+bool bz_config_ok ( void )
 {
-   if (sizeof(int)   != 4) return 0;
-   if (sizeof(short) != 2) return 0;
-   if (sizeof(char)  != 1) return 0;
-   return 1;
+   return (sizeof(int) == 4 && sizeof(short) == 2 && sizeof(char) == 1);
 }
 
 
 /*---------------------------------------------------*/
 static
-void* default_bzalloc ( void* opaque, int32_t items, int32_t size )
+void* default_bzalloc ( void* opaque, size_t items, size_t size )
 {
-   void* v = malloc ( items * size );
-   return v;
+   return calloc ( items, size );
 }
 
 static
@@ -138,11 +134,9 @@ void init_RL ( EState* s )
 
 
 static
-bool isempty_RL ( EState* s )
+bool isempty_RL ( const EState* s )
 {
-   if (s->state_in_ch < 256 && s->state_in_len > 0)
-      return false; else
-      return true;
+   return !(s->state_in_ch < 256 && s->state_in_len > 0);
 }
 
 
@@ -167,7 +161,7 @@ int BZ_API(BZ2_bzCompressInit)
    if (strm->bzalloc == NULL) strm->bzalloc = default_bzalloc;
    if (strm->bzfree == NULL) strm->bzfree = default_bzfree;
 
-   s = BZALLOC( sizeof(EState) );
+   s = BZALLOC( 1, sizeof(EState) );
    if (s == NULL) return BZ_MEM_ERROR;
    s->strm = strm;
 
@@ -176,10 +170,9 @@ int BZ_API(BZ2_bzCompressInit)
    s->ftab = NULL;
 
    n       = 100000 * blockSize100k;
-   s->arr1 = BZALLOC( n                  * sizeof(uint32_t) );
-   s->arr2 = BZALLOC( (n+BZ_N_OVERSHOOT) * sizeof(uint32_t) );
-   s->ftab = BZALLOC( 65537              * sizeof(uint32_t) );
-
+   s->arr1 = BZALLOC( n,                  sizeof(uint32_t) );
+   s->arr2 = BZALLOC( n + BZ_N_OVERSHOOT, sizeof(uint32_t) );
+   s->ftab = BZALLOC( 65537,              sizeof(uint32_t) );
    if (s->arr1 == NULL || s->arr2 == NULL || s->ftab == NULL) {
       if (s->arr1 != NULL) BZFREE(s->arr1);
       if (s->arr2 != NULL) BZFREE(s->arr2);
@@ -507,7 +500,7 @@ int BZ_API(BZ2_bzDecompressInit)
    if (strm->bzalloc == NULL) strm->bzalloc = default_bzalloc;
    if (strm->bzfree == NULL) strm->bzfree = default_bzfree;
 
-   s = BZALLOC( sizeof(DState) );
+   s = BZALLOC( 1, sizeof(DState) );
    if (s == NULL) return BZ_MEM_ERROR;
    s->strm                  = strm;
    strm->state              = s;
@@ -686,7 +679,7 @@ bool unRLE_obuf_to_output_FAST ( DState* s )
 
 
 /*---------------------------------------------------*/
-inline int32_t BZ2_indexIntoF ( int32_t indx, int32_t *cftab )
+inline int32_t BZ2_indexIntoF ( int32_t indx, const int32_t *cftab )
 {
    int32_t nb, na, mid;
    nb = 0;
@@ -1383,10 +1376,10 @@ const char * BZ_API(BZ2_bzlibVersion)(void)
 #endif
 static
 BZFILE * bzopen_or_bzdopen
-               ( const char *path,   /* no use when bzdopen */
-                 int fd,             /* no use when bzdopen */
+               ( const char *path,       /* no use when bzdopen */
+                 int        fd,          /* no use when bzdopen */
                  const char *mode,
-                 int open_mode)      /* bzopen: 0, bzdopen:1 */
+                 int         open_mode)  /* bzopen: 0, bzdopen:1 */
 {
    int    bzerr;
    char   unused[BZ_MAX_UNUSED];
@@ -1475,7 +1468,7 @@ BZFILE * BZ_API(BZ2_bzopen)
 
 /*---------------------------------------------------*/
 BZFILE * BZ_API(BZ2_bzdopen)
-               ( int fd,
+               ( int         fd,
                  const char *mode )
 {
    return bzopen_or_bzdopen(NULL,fd,mode,/*bzdopen*/1);
@@ -1488,11 +1481,7 @@ int BZ_API(BZ2_bzread) (BZFILE* b, void* buf, int len )
    int bzerr, nread;
    if (((bzFile*)b)->lastErr == BZ_STREAM_END) return 0;
    nread = BZ2_bzRead(&bzerr,b,buf,len);
-   if (bzerr == BZ_OK || bzerr == BZ_STREAM_END) {
-      return nread;
-   } else {
-      return -1;
-   }
+   return (bzerr == BZ_OK || bzerr == BZ_STREAM_END) ? nread : -1;
 }
 
 
@@ -1500,13 +1489,8 @@ int BZ_API(BZ2_bzread) (BZFILE* b, void* buf, int len )
 int BZ_API(BZ2_bzwrite) (BZFILE* b, void* buf, int len )
 {
    int bzerr;
-
    BZ2_bzWrite(&bzerr,b,buf,len);
-   if(bzerr == BZ_OK){
-      return len;
-   }else{
-      return -1;
-   }
+   return (bzerr == BZ_OK) ? len : -1;
 }
 
 
