@@ -1070,8 +1070,8 @@ void compress ( const char* name )
 
    switch (srcMode) {
       case SM_I2O:
-         copyFileName ( inName, (char*)"(stdin)" );
-         copyFileName ( outName, (char*)"(stdout)" );
+         copyFileName ( inName, "(stdin)" );
+         copyFileName ( outName, "(stdout)" );
          break;
       case SM_F2F:
          copyFileName ( inName, name );
@@ -1080,7 +1080,7 @@ void compress ( const char* name )
          break;
       case SM_F2O:
          copyFileName ( inName, name );
-         copyFileName ( outName, (char*)"(stdout)" );
+         copyFileName ( outName, "(stdout)" );
          break;
    }
 
@@ -1254,8 +1254,8 @@ void uncompress ( const char* name )
    cantGuess = false;
    switch (srcMode) {
       case SM_I2O:
-         copyFileName ( inName, (char*)"(stdin)" );
-         copyFileName ( outName, (char*)"(stdout)" );
+         copyFileName ( inName, "(stdin)" );
+         copyFileName ( outName, "(stdout)" );
          break;
       case SM_F2F:
          copyFileName ( inName, name );
@@ -1268,7 +1268,7 @@ void uncompress ( const char* name )
          break;
       case SM_F2O:
          copyFileName ( inName, name );
-         copyFileName ( outName, (char*)"(stdout)" );
+         copyFileName ( outName, "(stdout)" );
          break;
    }
 
@@ -1446,9 +1446,9 @@ void testf ( const char* name )
    if (name == NULL && srcMode != SM_I2O)
       panic ( "testf: bad modes\n" );
 
-   copyFileName ( outName, (char*)"(none)" );
+   copyFileName ( outName, "(none)" );
    switch (srcMode) {
-      case SM_I2O: copyFileName ( inName, (char*)"(stdin)" ); break;
+      case SM_I2O: copyFileName ( inName, "(stdin)" ); break;
       case SM_F2F: copyFileName ( inName, name ); break;
       case SM_F2O: copyFileName ( inName, name ); break;
    }
@@ -1736,8 +1736,8 @@ int main ( int argc, char *argv[] )
 #  endif
 #  endif
 
-   copyFileName ( inName,  (char*)"(none)" );
-   copyFileName ( outName, (char*)"(none)" );
+   copyFileName ( inName, "(none)" );
+   copyFileName ( outName, "(none)" );
 
    copyFileName ( progNameReally, argv[0] );
    progName = &progNameReally[0];
@@ -1749,8 +1749,8 @@ int main ( int argc, char *argv[] )
         expand filename wildcards in arg list.
    --*/
    argList = NULL;
-   addFlagsFromEnvVar ( &argList,  (char*)"BZIP2" );
-   addFlagsFromEnvVar ( &argList,  (char*)"BZIP" );
+   addFlagsFromEnvVar ( &argList, "BZIP2" );
+   addFlagsFromEnvVar ( &argList, "BZIP" );
    for (i = 1; i <= argc-1; i++)
       APPEND_FILESPEC(argList, argv[i]);
 
