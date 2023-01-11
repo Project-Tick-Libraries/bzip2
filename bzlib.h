@@ -45,22 +45,23 @@ extern "C" {
 #define BZ_OUTBUFF_FULL      (-8)
 #define BZ_CONFIG_ERROR      (-9)
 
+#include <stdint.h>
+#include <sys/types.h>
+
 typedef
    struct {
       char *next_in;
-      unsigned int avail_in;
-      unsigned int total_in_lo32;
-      unsigned int total_in_hi32;
+      uint32_t avail_in;
+      uint64_t total_in;
 
       char *next_out;
-      unsigned int avail_out;
-      unsigned int total_out_lo32;
-      unsigned int total_out_hi32;
+      uint32_t avail_out;
+      uint64_t total_out;
 
       void *state;
 
-      void *(*bzalloc)(void *,size_t,size_t);
-      void (*bzfree)(void *,void *);
+      void *(*bzalloc)(void *, size_t, size_t);
+      void (*bzfree)(void *, void *);
       void *opaque;
    }
    bz_stream;

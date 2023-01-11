@@ -1045,14 +1045,12 @@ kind.</para>
 <programlisting>
 typedef struct {
   char *next_in;
-  unsigned int avail_in;
-  unsigned int total_in_lo32;
-  unsigned int total_in_hi32;
+  uint32_t avail_in;
+  uint64 total_in;
 
   char *next_out;
-  unsigned int avail_out;
-  unsigned int total_out_lo32;
-  unsigned int total_out_hi32;
+  uint32_t avail_out;
+  uint64_t total_out;
 
   void *state;
 
@@ -1105,18 +1103,11 @@ use the standard <computeroutput>malloc</computeroutput> /
 <computeroutput>opaque</computeroutput> should be filled
 appropriately, as just described.  Upon return, the internal
 state will have been allocated and initialised, and
-<computeroutput>total_in_lo32</computeroutput>,
-<computeroutput>total_in_hi32</computeroutput>,
-<computeroutput>total_out_lo32</computeroutput> and
-<computeroutput>total_out_hi32</computeroutput> will have been
-set to zero.  These four fields are used by the library to inform
+<computeroutput>total_in</computeroutput> and
+<computeroutput>total_out</computeroutput> will have been
+set to zero.  These two fields are used by the library to inform
 the caller of the total amount of data passed into and out of the
-library, respectively.  You should not try to change them.  As of
-version 1.0, 64-bit counts are maintained, even on 32-bit
-platforms, using the <computeroutput>_hi32</computeroutput>
-fields to store the upper 32 bits of the count.  So, for example,
-the total amount of data in is <computeroutput>(total_in_hi32
-&#60;&#60; 32) + total_in_lo32</computeroutput>.</para>
+library, respectively.  You should not try to change them.</para>
 
 <para>Parameter <computeroutput>blockSize100k</computeroutput>
 specifies the block size to be used for compression.  It should
