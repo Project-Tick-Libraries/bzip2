@@ -1046,7 +1046,7 @@ kind.</para>
 typedef struct {
   char *next_in;
   uint32_t avail_in;
-  uint64 total_in;
+  uint64_t total_in;
 
   char *next_out;
   uint32_t avail_out;
