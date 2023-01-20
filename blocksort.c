@@ -101,7 +101,7 @@ void fallbackQSort3 ( uint32_t*       fmap,
    int32_t  stackLo[FALLBACK_QSORT_STACK_SIZE];
    int32_t  stackHi[FALLBACK_QSORT_STACK_SIZE];
 
-   r = 0;
+   r = 0U;
 
    sp = 0;
    fpush ( loSt, hiSt );
@@ -123,11 +123,11 @@ void fallbackQSort3 ( uint32_t*       fmap,
          7621 and 32768 is taken from Sedgewick's algorithms
          book, chapter 35.
       */
-      r = ((r * 7621) + 1) % 32768;
-      r3 = r % 3;
-      if (r3 == 0) med = eclass[fmap[lo]]; else
-      if (r3 == 1) med = eclass[fmap[(lo+hi)>>1]]; else
-                   med = eclass[fmap[hi]];
+      r = ((r * 7621U) + 1U) % 32768U;
+      r3 = r % 3U;
+      if (r3 == 0U) med = eclass[fmap[lo]]; else
+      if (r3 == 1U) med = eclass[fmap[(lo+hi)>>1]]; else
+                    med = eclass[fmap[hi]];
 
       unLo = ltLo = lo;
       unHi = gtHi = hi;
@@ -202,11 +202,11 @@ void fallbackQSort3 ( uint32_t*       fmap,
       bhtab [ 0 .. 2+(nblock/32) ] destroyed
 */
 
-#define       SET_BH(zz)  bhtab[(zz) >> 5] |= ((uint32_t)1 << ((zz) & 31))
-#define     CLEAR_BH(zz)  bhtab[(zz) >> 5] &= ~((uint32_t)1 << ((zz) & 31))
-#define     ISSET_BH(zz)  (bhtab[(zz) >> 5] & ((uint32_t)1 << ((zz) & 31)))
+#define       SET_BH(zz)  bhtab[(zz) >> 5] |= (1U << ((zz) & 31))
+#define     CLEAR_BH(zz)  bhtab[(zz) >> 5] &= ~(1U << ((zz) & 31))
+#define     ISSET_BH(zz)  (bhtab[(zz) >> 5] & (1U << ((zz) & 31)))
 #define      WORD_BH(zz)  bhtab[(zz) >> 5]
-#define UNALIGNED_BH(zz)  ((zz) & 0x01f)
+#define UNALIGNED_BH(zz)  ((zz) & 0x1f)
 
 static
 void fallbackSort ( uint32_t* fmap,
@@ -241,7 +241,7 @@ void fallbackSort ( uint32_t* fmap,
    }
 
    nBhtab = 2 + (nblock / 32);
-   for (i = 0; i < nBhtab; i++) bhtab[i] = 0;
+   for (i = 0; i < nBhtab; i++) bhtab[i] = 0U;
    for (i = 0; i < 256; i++) SET_BH(ftab[i]);
 
    /*--
@@ -278,14 +278,14 @@ void fallbackSort ( uint32_t* fmap,
          k = r + 1;
          while (ISSET_BH(k) && UNALIGNED_BH(k)) k++;
          if (ISSET_BH(k)) {
-            while (WORD_BH(k) == 0xffffffff) k += 32;
+            while (WORD_BH(k) == 0xffffffffU) k += 32;
             while (ISSET_BH(k)) k++;
          }
          l = k - 1;
          if (l >= nblock) break;
          while (!ISSET_BH(k) && UNALIGNED_BH(k)) k++;
          if (!ISSET_BH(k)) {
-            while (WORD_BH(k) == 0x00000000) k += 32;
+            while (WORD_BH(k) == 0x00000000U) k += 32;
             while (!ISSET_BH(k)) k++;
          }
          r = k - 1;
@@ -405,7 +405,7 @@ bool mainGtU ( uint32_t        i1,
    if (c1 != c2) return (c1 > c2);
    i1++; i2++;
 
-   k = nblock + 8;
+   k = (int32_t)(nblock + 8U);
 
    do {
       /* 1 */
@@ -744,8 +744,8 @@ void mainQSort3 ( uint32_t*       ptr,
 */
 
 #define BIGFREQ(b) (ftab[((b)+1) << 8] - ftab[(b) << 8])
-#define SETMASK (1 << 21)
-#define CLEARMASK (~(SETMASK))
+#define SETMASK   0x00200000U  /* (1 << 21) */
+#define CLEARMASK 0xFFDFFFFFU  /* (~(SETMASK)) */
 
 static
 void mainSort ( uint32_t* ptr,
@@ -767,26 +767,26 @@ void mainSort ( uint32_t* ptr,
    if (verb >= 4) VPrintf ( "        main sort initialise ...\n" );
 
    /*-- set up the 2-byte frequency table --*/
-   for (i = 65536; i >= 0; i--) ftab[i] = 0;
+   for (i = 65536; i >= 0; i--) ftab[i] = 0U;
 
-   j = block[0] << 8;
+   j = (int32_t)(block[0] << 8);
    i = nblock-1;
    for (; i >= 3; i -= 4) {
-      quadrant[i] = 0;
+      quadrant[i] = 0U;
       j = (j >> 8) | ( ((uint16_t)block[i]) << 8);
       ftab[j]++;
-      quadrant[i-1] = 0;
+      quadrant[i-1] = 0U;
       j = (j >> 8) | ( ((uint16_t)block[i-1]) << 8);
       ftab[j]++;
-      quadrant[i-2] = 0;
+      quadrant[i-2] = 0U;
       j = (j >> 8) | ( ((uint16_t)block[i-2]) << 8);
       ftab[j]++;
-      quadrant[i-3] = 0;
+      quadrant[i-3] = 0U;
       j = (j >> 8) | ( ((uint16_t)block[i-3]) << 8);
       ftab[j]++;
    }
    for (; i >= 0; i--) {
-      quadrant[i] = 0;
+      quadrant[i] = 0U;
       j = (j >> 8) | ( ((uint16_t)block[i]) << 8);
       ftab[j]++;
    }
@@ -794,7 +794,7 @@ void mainSort ( uint32_t* ptr,
    /*-- (emphasises close relationship of block & quadrant) --*/
    for (i = 0; i < BZ_N_OVERSHOOT; i++) {
       block   [nblock+i] = block[i];
-      quadrant[nblock+i] = 0;
+      quadrant[nblock+i] = 0U;
    }
 
    if (verb >= 4) VPrintf ( "        bucket sorting ...\n" );
@@ -802,7 +802,7 @@ void mainSort ( uint32_t* ptr,
    /*-- Complete the initial radix sort --*/
    for (i = 1; i <= 65536; i++) ftab[i] += ftab[i-1];
 
-   s = block[0] << 8;
+   s = (uint16_t)(block[0] << 8);
    i = nblock-1;
    for (; i >= 3; i -= 4) {
       s = (s >> 8) | (block[i] << 8);
@@ -887,8 +887,8 @@ void mainSort ( uint32_t* ptr,
          if (j != ss) {
             sb = (ss << 8) + j;
             if ( ! (ftab[sb] & SETMASK) ) {
-               int32_t lo = ftab[sb]   & CLEARMASK;
-               int32_t hi = (ftab[sb+1] & CLEARMASK) - 1;
+               int32_t lo = (int32_t)(ftab[sb]    & CLEARMASK);
+               int32_t hi = (int32_t)((ftab[sb+1] & CLEARMASK) - 1U);
                if (hi > lo) {
                   if (verb >= 4)
                      VPrintf ( "        qsort [0x%x, 0x%x]   "
@@ -917,16 +917,16 @@ void mainSort ( uint32_t* ptr,
       --*/
       {
          for (j = 0; j <= 255; j++) {
-            copyStart[j] =  ftab[(j << 8) + ss]     & CLEARMASK;
-            copyEnd  [j] = (ftab[(j << 8) + ss + 1] & CLEARMASK) - 1;
+            copyStart[j] = (int32_t)(ftab[(j << 8) + ss]      & CLEARMASK);
+            copyEnd  [j] = (int32_t)((ftab[(j << 8) + ss + 1] & CLEARMASK) - 1U);
          }
-         for (j = ftab[ss << 8] & CLEARMASK; j < copyStart[ss]; j++) {
+         for (j = (int32_t)(ftab[ss << 8] & CLEARMASK); j < copyStart[ss]; j++) {
             k = ptr[j]-1; if (k < 0) k += nblock;
             c1 = block[k];
             if (!bigDone[c1])
                ptr[ copyStart[c1]++ ] = k;
          }
-         for (j = (ftab[(ss+1) << 8] & CLEARMASK) - 1; j > copyEnd[ss]; j--) {
+         for (j = (int32_t)((ftab[(ss+1) << 8] & CLEARMASK) - 1U); j > copyEnd[ss]; j--) {
             k = ptr[j]-1; if (k < 0) k += nblock;
             c1 = block[k];
             if (!bigDone[c1])
@@ -987,9 +987,9 @@ void mainSort ( uint32_t* ptr,
       bigDone[ss] = true;
 
       if (i < 255) {
-         int32_t bbStart  = ftab[ss << 8] & CLEARMASK;
-         int32_t bbSize   = (ftab[(ss+1) << 8] & CLEARMASK) - bbStart;
-         int32_t shifts   = 0;
+         int32_t bbStart = (int32_t)(ftab[ss << 8] & CLEARMASK);
+         int32_t bbSize  = (int32_t)((ftab[(ss+1) << 8] & CLEARMASK) - (uint32_t)bbStart);
+         int32_t shifts  = 0;
 
          while ((bbSize >> shifts) > 65534) shifts++;
 
@@ -1082,7 +1082,7 @@ void BZ2_blockSort ( EState* s )
 
    s->origPtr = -1;
    for (i = 0; i < s->nblock; i++)
-      if (ptr[i] == 0)
+      if (ptr[i] == 0U)
          { s->origPtr = i; break; };
 
    AssertH( s->origPtr != -1, 1003 );

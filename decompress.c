@@ -207,36 +207,34 @@ int32_t BZ2_decompress ( DState* s )
       s->blockSize100k -= BZ_HDR_0;
 
       if (s->smallDecompress) {
-         s->ll16 = BZALLOC( s->blockSize100k * 100000, sizeof(uint16_t) );
-         s->ll4  = BZALLOC(
-                      (1 + s->blockSize100k * 100000) >> 1, sizeof(uint8_t)
-                   );
+         s->ll16 = BZALLOC( (size_t)(s->blockSize100k * 100000),          sizeof(uint16_t) );
+         s->ll4  = BZALLOC( (size_t)(1 + s->blockSize100k * 100000) >> 1, sizeof(uint8_t) );
          if (s->ll16 == NULL || s->ll4 == NULL) RETURN(BZ_MEM_ERROR);
       } else {
-         s->tt  = BZALLOC( s->blockSize100k * 100000, sizeof(int32_t) );
+         s->tt   = BZALLOC( (size_t)(s->blockSize100k * 100000),          sizeof(int32_t) );
          if (s->tt == NULL) RETURN(BZ_MEM_ERROR);
       }
 
       GET_UCHAR(BZ_X_BLKHDR_1, uc);
 
-      if (uc == 0x17) goto endhdr_2;
-      if (uc != 0x31) RETURN(BZ_DATA_ERROR);
+      if (uc == 0x17U) goto endhdr_2;
+      if (uc != 0x31U) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_BLKHDR_2, uc);
-      if (uc != 0x41) RETURN(BZ_DATA_ERROR);
+      if (uc != 0x41U) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_BLKHDR_3, uc);
-      if (uc != 0x59) RETURN(BZ_DATA_ERROR);
+      if (uc != 0x59U) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_BLKHDR_4, uc);
-      if (uc != 0x26) RETURN(BZ_DATA_ERROR);
+      if (uc != 0x26U) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_BLKHDR_5, uc);
-      if (uc != 0x53) RETURN(BZ_DATA_ERROR);
+      if (uc != 0x53U) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_BLKHDR_6, uc);
-      if (uc != 0x59) RETURN(BZ_DATA_ERROR);
+      if (uc != 0x59U) RETURN(BZ_DATA_ERROR);
 
       s->currBlockNo++;
       if (s->verbosity >= 2)
          VPrintf ( "\n    [%d: huff+mtf ", s->currBlockNo );
 
-      s->storedBlockCRC = 0;
+      s->storedBlockCRC = 0U;
       GET_UCHAR(BZ_X_BCRC_1, uc);
       s->storedBlockCRC = (s->storedBlockCRC << 8) | ((uint32_t)uc);
       GET_UCHAR(BZ_X_BCRC_2, uc);
@@ -264,7 +262,7 @@ int32_t BZ2_decompress ( DState* s )
       /*--- Receive the mapping table ---*/
       for (i = 0; i < 16; i++) {
          GET_BIT(BZ_X_MAPPING_1, uc);
-         if (uc == 1)
+         if (uc == 1U)
             s->inUse16[i] = true; else
             s->inUse16[i] = false;
       }
@@ -275,7 +273,7 @@ int32_t BZ2_decompress ( DState* s )
          if (s->inUse16[i])
             for (j = 0; j < 16; j++) {
                GET_BIT(BZ_X_MAPPING_2, uc);
-               if (uc == 1) s->inUse[i * 16 + j] = true;
+               if (uc == 1U) s->inUse[i * 16 + j] = true;
             }
       makeMaps_d ( s );
       if (s->nInUse == 0) RETURN(BZ_DATA_ERROR);
@@ -290,7 +288,7 @@ int32_t BZ2_decompress ( DState* s )
          j = 0;
          while (true) {
             GET_BIT(BZ_X_SELECTOR_3, uc);
-            if (uc == 0) break;
+            if (uc == 0U) break;
             j++;
             if (j >= nGroups) RETURN(BZ_DATA_ERROR);
          }
@@ -311,7 +309,7 @@ int32_t BZ2_decompress ( DState* s )
          for (i = 0; i < nSelectors; i++) {
             v = s->selectorMtf[i];
             tmp = pos[v];
-            while (v > 0) { pos[v] = pos[v-1]; v--; }
+            while (v > 0U) { pos[v] = pos[v-1]; v--; }
             pos[0] = tmp;
             s->selector[i] = tmp;
          }
@@ -324,9 +322,9 @@ int32_t BZ2_decompress ( DState* s )
             while (true) {
                if (curr < 1 || curr > 20) RETURN(BZ_DATA_ERROR);
                GET_BIT(BZ_X_CODING_2, uc);
-               if (uc == 0) break;
+               if (uc == 0U) break;
                GET_BIT(BZ_X_CODING_3, uc);
-               if (uc == 0) curr++; else curr--;
+               if (uc == 0U) curr++; else curr--;
             }
             s->len[t][i] = curr;
          }
@@ -434,15 +432,15 @@ int32_t BZ2_decompress ( DState* s )
                   /* avoid general-case expense */
                   pp = s->mtfbase[0];
                   uc = s->mtfa[pp+nn];
-                  while (nn > 3) {
-                     int32_t z = pp+nn;
+                  while (nn > 3U) {
+                     int32_t z = pp + (int32_t)nn;
                      s->mtfa[(z)  ] = s->mtfa[(z)-1];
                      s->mtfa[(z)-1] = s->mtfa[(z)-2];
                      s->mtfa[(z)-2] = s->mtfa[(z)-3];
                      s->mtfa[(z)-3] = s->mtfa[(z)-4];
-                     nn -= 4;
+                     nn -= 4U;
                   }
-                  while (nn > 0) {
+                  while (nn > 0U) {
                      s->mtfa[(pp+nn)] = s->mtfa[(pp+nn)-1]; nn--;
                   };
                   s->mtfa[pp] = uc;
@@ -520,7 +518,7 @@ int32_t BZ2_decompress ( DState* s )
       }
 
       s->state_out_len = 0;
-      s->state_out_ch  = 0;
+      s->state_out_ch  = 0U;
       BZ_INITIALISE_CRC ( s->calculatedBlockCRC );
       s->state = BZ_X_OUTPUT;
       if (s->verbosity >= 2) VPrintf ( "rt+rld" );
@@ -562,7 +560,7 @@ int32_t BZ2_decompress ( DState* s )
 
          /*-- compute the T^(-1) vector --*/
          for (i = 0; i < nblock; i++) {
-            uc = (uint8_t)(s->tt[i] & 0xff);
+            uc = (uint8_t)(s->tt[i] & 0xffU);
             s->tt[s->cftab[uc]] |= (i << 8);
             s->cftab[uc]++;
          }
@@ -586,17 +584,17 @@ int32_t BZ2_decompress ( DState* s )
     endhdr_2:
 
       GET_UCHAR(BZ_X_ENDHDR_2, uc);
-      if (uc != 0x72) RETURN(BZ_DATA_ERROR);
+      if (uc != 0x72U) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_ENDHDR_3, uc);
-      if (uc != 0x45) RETURN(BZ_DATA_ERROR);
+      if (uc != 0x45U) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_ENDHDR_4, uc);
-      if (uc != 0x38) RETURN(BZ_DATA_ERROR);
+      if (uc != 0x38U) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_ENDHDR_5, uc);
-      if (uc != 0x50) RETURN(BZ_DATA_ERROR);
+      if (uc != 0x50U) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_ENDHDR_6, uc);
-      if (uc != 0x90) RETURN(BZ_DATA_ERROR);
+      if (uc != 0x90U) RETURN(BZ_DATA_ERROR);
 
-      s->storedCombinedCRC = 0;
+      s->storedCombinedCRC = 0U;
       GET_UCHAR(BZ_X_CCRC_1, uc);
       s->storedCombinedCRC = (s->storedCombinedCRC << 8) | ((uint32_t)uc);
       GET_UCHAR(BZ_X_CCRC_2, uc);

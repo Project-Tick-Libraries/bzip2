@@ -85,7 +85,7 @@
            int retVal = setmode ( fileno ( fd ),        \
                                   O_BINARY );           \
            ERROR_IF_MINUS_ONE ( retVal );               \
-        } while ( 0 )
+        } while ( false )
 #   endif
 
 #   ifdef __CYGWIN__
@@ -97,7 +97,7 @@
            int retVal = setmode ( fileno ( fd ),        \
                                   O_BINARY );           \
            ERROR_IF_MINUS_ONE ( retVal );               \
-        } while ( 0 )
+        } while ( false )
 #   endif
 #endif /* BZ_UNIX */
 
@@ -126,7 +126,7 @@
          int retVal = setmode ( fileno ( fd ),        \
                                 O_BINARY );           \
          ERROR_IF_MINUS_ONE ( retVal );               \
-      } while ( 0 )
+      } while ( false )
 
 #endif /* BZ_LCCWIN32 */
 
@@ -270,7 +270,7 @@ void compressStream ( FILE* stream, FILE* zStream )
    while (true) {
 
       if (myfeof(stream)) break;
-      nIbuf = fread ( ibuf, sizeof(uint8_t), 5000, stream );
+      nIbuf = fread ( ibuf, sizeof(uint8_t), 5000U, stream );
       if (ferror(stream)) goto errhandler_io;
       if (nIbuf > 0) BZ2_bzWrite ( &bzerr, bzf, (void*)ibuf, nIbuf );
       if (bzerr != BZ_OK) goto errhandler;
@@ -299,7 +299,7 @@ void compressStream ( FILE* stream, FILE* zStream )
    if (ret == EOF) goto errhandler_io;
 
    if (verbosity >= 1) {
-      if (nbytes_in_lo32 == 0 && nbytes_in_hi32 == 0) {
+      if (nbytes_in_lo32 == 0U && nbytes_in_hi32 == 0U) {
          fprintf ( stderr, " no data compressed.\n");
       } else {
          char   buf_nin[32], buf_nout[32];
@@ -380,7 +380,7 @@ bool uncompressStream ( FILE* zStream, FILE* stream )
          nread = BZ2_bzRead ( &bzerr, bzf, obuf, 5000 );
          if (bzerr == BZ_DATA_ERROR_MAGIC) goto trycat;
          if ((bzerr == BZ_OK || bzerr == BZ_STREAM_END) && nread > 0)
-            fwrite ( obuf, sizeof(uint8_t), nread, stream );
+            fwrite ( obuf, sizeof(uint8_t), (size_t)nread, stream );
          if (ferror(stream)) goto errhandler_io;
       }
       if (bzerr != BZ_STREAM_END) goto errhandler;
@@ -424,9 +424,9 @@ trycat:
       rewind(zStream);
       while (true) {
          if (myfeof(zStream)) break;
-         nread = fread ( obuf, sizeof(uint8_t), 5000, zStream );
+         nread = fread ( obuf, sizeof(uint8_t), 5000U, zStream );
          if (ferror(zStream)) goto errhandler_io;
-         if (nread > 0) fwrite ( obuf, sizeof(uint8_t), nread, stream );
+         if (nread > 0) fwrite ( obuf, sizeof(uint8_t), (size_t)nread, stream );
          if (ferror(stream)) goto errhandler_io;
       }
       goto closeok;

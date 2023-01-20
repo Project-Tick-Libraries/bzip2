@@ -37,7 +37,7 @@
 void BZ2_bsInitWrite ( EState* s )
 {
    s->bsLive = 0;
-   s->bsBuff = 0;
+   s->bsBuff = 0U;
 }
 
 
@@ -82,10 +82,10 @@ void bsW ( EState* s, int32_t n, uint32_t v )
 static
 void bsPutUInt32 ( EState* s, uint32_t u )
 {
-   bsW ( s, 8, (u >> 24) & 0xffL );
-   bsW ( s, 8, (u >> 16) & 0xffL );
-   bsW ( s, 8, (u >>  8) & 0xffL );
-   bsW ( s, 8,  u        & 0xffL );
+   bsW ( s, 8, (u >> 24) & 0xffU );
+   bsW ( s, 8, (u >> 16) & 0xffU );
+   bsW ( s, 8, (u >>  8) & 0xffU );
+   bsW ( s, 8,  u        & 0xffU );
 }
 
 
@@ -353,13 +353,13 @@ void sendMTFValues ( EState* s )
             Calculate the cost of this group as coded
             by each of the coding tables.
          --*/
-         for (t = 0; t < nGroups; t++) cost[t] = 0;
+         for (t = 0; t < nGroups; t++) cost[t] = 0U;
 
          if (nGroups == 6 && 50 == ge-gs+1) {
             /*--- fast track the common case ---*/
             register uint32_t cost01, cost23, cost45;
             register uint16_t icv;
-            cost01 = cost23 = cost45 = 0;
+            cost01 = cost23 = cost45 = 0U;
 
 #           define BZ_ITER(nn)                \
                icv = mtfv[gs+(nn)];           \
@@ -380,9 +380,9 @@ void sendMTFValues ( EState* s )
 
 #           undef BZ_ITER
 
-            cost[0] = cost01 & 0xffff; cost[1] = cost01 >> 16;
-            cost[2] = cost23 & 0xffff; cost[3] = cost23 >> 16;
-            cost[4] = cost45 & 0xffff; cost[5] = cost45 >> 16;
+            cost[0] = cost01 & 0xffffU; cost[1] = cost01 >> 16;
+            cost[2] = cost23 & 0xffffU; cost[3] = cost23 >> 16;
+            cost[4] = cost45 & 0xffffU; cost[5] = cost45 >> 16;
 
          } else {
             /*--- slow version which correctly handles all situations ---*/
@@ -502,12 +502,12 @@ void sendMTFValues ( EState* s )
 
       nBytes = s->numZ;
       for (i = 0; i < 16; i++)
-         if (inUse16[i]) bsW(s,1,1); else bsW(s,1,0);
+         if (inUse16[i]) bsW(s,1,1U); else bsW(s,1,0U);
 
       for (i = 0; i < 16; i++)
          if (inUse16[i])
             for (j = 0; j < 16; j++) {
-               if (s->inUse[i * 16 + j]) bsW(s,1,1); else bsW(s,1,0);
+               if (s->inUse[i * 16 + j]) bsW(s,1,1U); else bsW(s,1,0U);
             }
 
       if (s->verbosity >= 3)
@@ -516,11 +516,11 @@ void sendMTFValues ( EState* s )
 
    /*--- Now the selectors. ---*/
    nBytes = s->numZ;
-   bsW ( s, 3, nGroups );
-   bsW ( s, 15, nSelectors );
+   bsW ( s, 3, (uint32_t)nGroups );
+   bsW ( s, 15, (uint32_t)nSelectors );
    for (i = 0; i < nSelectors; i++) {
-      for (j = 0; j < s->selectorMtf[i]; j++) bsW(s,1,1);
-      bsW(s,1,0);
+      for (j = 0; j < s->selectorMtf[i]; j++) bsW(s,1,1U);
+      bsW(s,1,0U);
    }
    if (s->verbosity >= 3)
       VPrintf( "selectors %d, ", s->numZ-nBytes );
@@ -530,11 +530,11 @@ void sendMTFValues ( EState* s )
 
    for (t = 0; t < nGroups; t++) {
       int32_t curr = s->len[t][0];
-      bsW ( s, 5, curr );
+      bsW ( s, 5, (uint32_t)curr );
       for (i = 0; i < alphaSize; i++) {
-         while (curr < s->len[t][i]) { bsW(s,2,2); curr++; /* 10 */ };
-         while (curr > s->len[t][i]) { bsW(s,2,3); curr--; /* 11 */ };
-         bsW ( s, 1, 0 );
+         while (curr < s->len[t][i]) { bsW(s,2,2U); curr++; /* 10 */ };
+         while (curr > s->len[t][i]) { bsW(s,2,3U); curr--; /* 11 */ };
+         bsW ( s, 1, 0U );
       }
    }
 
@@ -559,11 +559,11 @@ void sendMTFValues ( EState* s )
             int32_t* s_code_sel_selCtr
                = &(s->code[s->selector[selCtr]][0]);
 
-#           define BZ_ITAH(nn)                      \
-               mtfv_i = mtfv[gs+(nn)];              \
-               bsW ( s,                             \
-                     s_len_sel_selCtr[mtfv_i],      \
-                     s_code_sel_selCtr[mtfv_i] )
+#           define BZ_ITAH(nn)                              \
+               mtfv_i = mtfv[gs+(nn)];                      \
+               bsW ( s,                                     \
+                     s_len_sel_selCtr[mtfv_i],              \
+                     (uint32_t)s_code_sel_selCtr[mtfv_i] )
 
             BZ_ITAH(0);  BZ_ITAH(1);  BZ_ITAH(2);  BZ_ITAH(3);  BZ_ITAH(4);
             BZ_ITAH(5);  BZ_ITAH(6);  BZ_ITAH(7);  BZ_ITAH(8);  BZ_ITAH(9);
@@ -583,7 +583,7 @@ void sendMTFValues ( EState* s )
          for (i = gs; i <= ge; i++) {
             bsW ( s,
                   s->len  [s->selector[selCtr]] [mtfv[i]],
-                  s->code [s->selector[selCtr]] [mtfv[i]] );
+                  (uint32_t)s->code [s->selector[selCtr]] [mtfv[i]] );
          }
       }
 
@@ -644,9 +644,9 @@ void BZ2_compressBlock ( EState* s, bool is_last_block )
          so as to maintain backwards compatibility with
          older versions of bzip2.
       --*/
-      bsW(s,1,0);
+      bsW(s,1,0U);
 
-      bsW ( s, 24, s->origPtr );
+      bsW ( s, 24, (uint32_t)s->origPtr );
       generateMTFValues ( s );
       sendMTFValues ( s );
    }

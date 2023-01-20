@@ -89,7 +89,7 @@ int main ( int argc, char** argv )
       return 1;
    }
 
-   nIn = fread ( inbuf, 1, M_BLOCK, f );
+   nIn = fread ( inbuf, 1U, (size_t)M_BLOCK, f );
    fprintf ( stderr, "%d bytes read\n", nIn );
 
    nZ = M_BLOCK;

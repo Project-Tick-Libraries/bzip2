@@ -52,8 +52,8 @@ char inFileName[BZ_MAX_FILENAME];
 char outFileName[BZ_MAX_FILENAME];
 char progName[BZ_MAX_FILENAME];
 
-uint64_t bytesOut = 0;
-uint64_t bytesIn  = 0;
+uint64_t bytesOut = UINT64_C(0);
+uint64_t bytesIn  = UINT64_C(0);
 
 
 /*---------------------------------------------------*/
@@ -291,11 +291,11 @@ FILE* fopen_output_safely ( const char* name, const char* mode )
 #  define  BZ_SPLIT_SYM  '/'   /* path splitter on Unix platform */
 #endif
 
-#define BLOCK_HEADER_HI  0x00003141UL
-#define BLOCK_HEADER_LO  0x59265359UL
+#define BLOCK_HEADER_HI  0x00003141U
+#define BLOCK_HEADER_LO  0x59265359U
 
-#define BLOCK_ENDMARK_HI 0x00001772UL
-#define BLOCK_ENDMARK_LO 0x45385090UL
+#define BLOCK_ENDMARK_HI 0x00001772U
+#define BLOCK_ENDMARK_LO 0x45385090U
 
 /* Increase if necessary.  However, a .bz2 file with > 50000 blocks
    would have an uncompressed size of at least 40GB, so the chances
@@ -352,10 +352,10 @@ int main ( int argc, char** argv )
    bsIn = bsOpenReadStream ( inFile );
    fprintf ( stderr, "%s: searching for block boundaries ...\n", progName );
 
-   bitsRead = 0;
-   buffHi = buffLo = 0;
+   bitsRead = UINT64_C(0);
+   buffHi = buffLo = 0U;
    currBlock = 0;
-   bStart[currBlock] = 0;
+   bStart[currBlock] = UINT64_C(0);
 
    rbCtr = 0;
 
@@ -364,8 +364,8 @@ int main ( int argc, char** argv )
       bitsRead++;
       if (b == 2) {
          if (bitsRead >= bStart[currBlock] &&
-            (bitsRead - bStart[currBlock]) >= 40) {
-            bEnd[currBlock] = bitsRead-1;
+            (bitsRead - bStart[currBlock]) >= UINT64_C(40)) {
+            bEnd[currBlock] = bitsRead - UINT64_C(1);
             if (currBlock > 0)
                fprintf ( stderr, "   block %d runs from %" PRIu64
                                  " to %" PRIu64 " (incomplete)\n",
@@ -376,19 +376,19 @@ int main ( int argc, char** argv )
       }
       buffHi = (buffHi << 1) | (buffLo >> 31);
       buffLo = (buffLo << 1) | (b & 1);
-      if ( ( (buffHi & 0x0000ffff) == BLOCK_HEADER_HI
+      if ( ( (buffHi & 0xffffU) == BLOCK_HEADER_HI
              && buffLo == BLOCK_HEADER_LO)
            ||
-           ( (buffHi & 0x0000ffff) == BLOCK_ENDMARK_HI
+           ( (buffHi & 0xffffU) == BLOCK_ENDMARK_HI
              && buffLo == BLOCK_ENDMARK_LO)
          ) {
-         if (bitsRead > 49) {
-            bEnd[currBlock] = bitsRead-49;
+         if (bitsRead > UINT64_C(49)) {
+            bEnd[currBlock] = bitsRead - UINT64_C(49);
          } else {
-            bEnd[currBlock] = 0;
+            bEnd[currBlock] = UINT64_C(0);
          }
          if (currBlock > 0 &&
-             (bEnd[currBlock] - bStart[currBlock]) >= 130) {
+             (bEnd[currBlock] - bStart[currBlock]) >= UINT64_C(130)) {
             fprintf ( stderr, "   block %d runs from %" PRIu64
                               " to %" PRIu64 "\n",
                       rbCtr+1,  bStart[currBlock], bEnd[currBlock] );
@@ -425,9 +425,9 @@ int main ( int argc, char** argv )
    bsIn = bsOpenReadStream ( inFile );
 
    /*-- placate gcc's dataflow analyser --*/
-   blockCRC = 0; bsWr = 0;
+   blockCRC = 0U; bsWr = 0;
 
-   bitsRead = 0;
+   bitsRead = UINT64_C(0);
    outFile = NULL;
    wrBlock = 0;
    while (true) {
@@ -435,7 +435,7 @@ int main ( int argc, char** argv )
       if (b == 2) break;
       buffHi = (buffHi << 1) | (buffLo >> 31);
       buffLo = (buffLo << 1) | (b & 1);
-      if (bitsRead == 47+rbStart[wrBlock])
+      if (bitsRead == UINT64_C(47) + rbStart[wrBlock])
          blockCRC = (buffHi << 16) | (buffLo >> 16);
 
       if (outFile != NULL && bitsRead >= rbStart[wrBlock]
