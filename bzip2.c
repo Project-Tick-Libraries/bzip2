@@ -191,9 +191,9 @@ static void    applySavedFileAttrToOutputFile ( int fd );
 /*---------------------------------------------------*/
 
 static
-void uInt64_from_UInt32s ( uint64_t* n, uint32_t lo32, uint32_t hi32 )
+uint64_t uInt64_from_UInt32s ( uint32_t lo32, uint32_t hi32 )
 {
-   *n = ((uint64_t)hi32 << 32) | (uint64_t)lo32;
+   return (((uint64_t)hi32 << 32) | (uint64_t)lo32);
 }
 
 
@@ -305,10 +305,8 @@ void compressStream ( FILE* stream, FILE* zStream )
          char   buf_nin[32], buf_nout[32];
          uint64_t nbytes_in,   nbytes_out;
          double nbytes_in_d, nbytes_out_d;
-         uInt64_from_UInt32s ( &nbytes_in,
-            nbytes_in_lo32, nbytes_in_hi32 );
-         uInt64_from_UInt32s ( &nbytes_out,
-            nbytes_out_lo32, nbytes_out_hi32 );
+         nbytes_in    = uInt64_from_UInt32s ( nbytes_in_lo32, nbytes_in_hi32 );
+         nbytes_out   = uInt64_from_UInt32s ( nbytes_out_lo32, nbytes_out_hi32 );
          nbytes_in_d  = (double)nbytes_in;
          nbytes_out_d = (double)nbytes_out;
          uInt64_toAscii ( buf_nin, &nbytes_in );
