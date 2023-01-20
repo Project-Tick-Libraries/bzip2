@@ -1055,9 +1055,9 @@ void BZ_API(BZ2_bzWriteClose64)
    if (nbytes_in_hi32 != NULL)
       *nbytes_in_hi32 = (uint32_t)(bzf->strm.total_in >> 32);
    if (nbytes_out_lo32 != NULL)
-      *nbytes_out_lo32 = (uint64_t)(bzf->strm.total_out & 0xFFFFFFFF);
+      *nbytes_out_lo32 = (uint32_t)(bzf->strm.total_out & 0xFFFFFFFF);
    if (nbytes_out_hi32 != NULL)
-      *nbytes_out_hi32 = (uint64_t)(bzf->strm.total_out >> 32);
+      *nbytes_out_hi32 = (uint32_t)(bzf->strm.total_out >> 32);
 
    BZ_SETERR(BZ_OK);
    BZ2_bzCompressEnd ( &(bzf->strm) );
