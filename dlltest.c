@@ -161,7 +161,7 @@ int main(int argc,char *argv[])
             printf("can't bz2openstream\n");
             exit(1);
          }
-         while((len=fread(buff,1,0x1000U,fp_r))>0){
+         while((len=fread(buff,1U,0x1000U,fp_r))>0){
             BZ2_bzwrite(BZ2fp_w,buff,len);
          }
          BZ2_bzclose(BZ2fp_w);

@@ -576,21 +576,20 @@ bool unRLE_obuf_to_output_FAST ( DState* s )
    } else {
 
       /* restore */
-      uint32_t        c_calculatedBlockCRC = s->calculatedBlockCRC;
-      uint8_t         c_state_out_ch       = s->state_out_ch;
-      int32_t         c_state_out_len      = s->state_out_len;
-      int32_t         c_nblock_used        = s->nblock_used;
-      int32_t         c_k0                 = s->k0;
-      uint32_t*       c_tt                 = s->tt;
-      uint32_t        c_tPos               = s->tPos;
-      char*           cs_next_out          = s->strm->next_out;
-      unsigned int    cs_avail_out         = s->strm->avail_out;
-      int32_t         ro_blockSize100k     = s->blockSize100k;
+      uint32_t  c_calculatedBlockCRC = s->calculatedBlockCRC;
+      uint8_t   c_state_out_ch       = s->state_out_ch;
+      int32_t   c_state_out_len      = s->state_out_len;
+      int32_t   c_nblock_used        = s->nblock_used;
+      int32_t   c_k0                 = s->k0;
+      uint32_t* c_tt                 = s->tt;
+      uint32_t  c_tPos               = s->tPos;
+      char*     cs_next_out          = s->strm->next_out;
+      uint32_t  cs_avail_out         = s->strm->avail_out;
+      int32_t   ro_blockSize100k     = s->blockSize100k;
       /* end restore */
 
       uint32_t     avail_out_INIT = cs_avail_out;
       int32_t      s_save_nblockPP = s->save_nblock+1;
-      unsigned int total_out_lo32_old;
 
       while (true) {
 
@@ -1051,11 +1050,11 @@ void BZ_API(BZ2_bzWriteClose64)
    }
 
    if (nbytes_in_lo32 != NULL)
-      *nbytes_in_lo32 = (uint32_t)(bzf->strm.total_in & 0xFFFFFFFFULL);
+      *nbytes_in_lo32 = (uint32_t)(bzf->strm.total_in & UINT64_C(0xFFFFFFFF));
    if (nbytes_in_hi32 != NULL)
       *nbytes_in_hi32 = (uint32_t)(bzf->strm.total_in >> 32);
    if (nbytes_out_lo32 != NULL)
-      *nbytes_out_lo32 = (uint32_t)(bzf->strm.total_out & 0xFFFFFFFFULL);
+      *nbytes_out_lo32 = (uint32_t)(bzf->strm.total_out & UINT64_C(0xFFFFFFFF));
    if (nbytes_out_hi32 != NULL)
       *nbytes_out_hi32 = (uint32_t)(bzf->strm.total_out >> 32);
 

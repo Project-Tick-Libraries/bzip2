@@ -380,9 +380,9 @@ void sendMTFValues ( EState* s )
 
 #           undef BZ_ITER
 
-            cost[0] = cost01 & 0xffffU; cost[1] = cost01 >> 16;
-            cost[2] = cost23 & 0xffffU; cost[3] = cost23 >> 16;
-            cost[4] = cost45 & 0xffffU; cost[5] = cost45 >> 16;
+            cost[0] = (uint16_t)(cost01 & 0xffffU); cost[1] = (uint16_t)(cost01 >> 16);
+            cost[2] = (uint16_t)(cost23 & 0xffffU); cost[3] = (uint16_t)(cost23 >> 16);
+            cost[4] = (uint16_t)(cost45 & 0xffffU); cost[5] = (uint16_t)(cost45 >> 16);
 
          } else {
             /*--- slow version which correctly handles all situations ---*/
