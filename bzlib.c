@@ -190,10 +190,10 @@ int BZ_API(BZ2_bzCompressInit)
    s->verbosity     = verbosity;
    s->workFactor    = workFactor;
 
-   s->block         = (uint8_t*)s->arr2;
-   s->mtfv          = (uint16_t*)s->arr1;
+   s->block         = (uint8_t*)(s->arr2);
+   s->mtfv          = (uint16_t*)(s->arr1);
    s->zbits         = NULL;
-   s->ptr           = (uint32_t*)s->arr1;
+   s->ptr           = (uint32_t*)(s->arr1);
 
    strm->state      = s;
    strm->total_in   = UINT64_C(0);

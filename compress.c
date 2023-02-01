@@ -583,7 +583,7 @@ void sendMTFValues ( EState* s )
          for (i = gs; i <= ge; i++) {
             bsW ( s,
                   s->len  [s->selector[selCtr]] [mtfv[i]],
-                  (uint32_t)s->code [s->selector[selCtr]] [mtfv[i]] );
+                  (uint32_t)(s->code[s->selector[selCtr]] [mtfv[i]]) );
          }
       }
 
@@ -644,9 +644,9 @@ void BZ2_compressBlock ( EState* s, bool is_last_block )
          so as to maintain backwards compatibility with
          older versions of bzip2.
       --*/
-      bsW(s,1,0U);
+      bsW( s, 1, 0U);
 
-      bsW ( s, 24, (uint32_t)s->origPtr );
+      bsW ( s, 24, (uint32_t)(s->origPtr) );
       generateMTFValues ( s );
       sendMTFValues ( s );
    }

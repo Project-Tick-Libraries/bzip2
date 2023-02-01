@@ -65,9 +65,7 @@ void flip_bit ( int bit )
 {
    int byteno = bit / 8;
    int bitno  = bit % 8;
-   uchar mask = 1 << bitno;
-   //fprintf ( stderr, "(byte %d  bit %d  mask %d)",
-   //          byteno, bitno, (int)mask );
+   uchar mask = 1U << bitno;
    zbuf[byteno] ^= mask;
 }
 

@@ -410,24 +410,24 @@ typedef
 
 /*-- Macros for decompression. --*/
 
-#define BZ_GET_FAST(cccc)                                                      \
-    /* c_tPos is unsigned, hence test < 0 is pointless. */                     \
-    if (s->tPos >= (uint32_t)100000 * (uint32_t)s->blockSize100k) return true; \
-    s->tPos = s->tt[s->tPos];                                                  \
-    cccc = (uint8_t)(s->tPos & 0xff);                                          \
+#define BZ_GET_FAST(cccc)                                              \
+    /* c_tPos is unsigned, hence test < 0 is pointless. */             \
+    if (s->tPos >= (uint32_t)(100000 * s->blockSize100k)) return true; \
+    s->tPos = s->tt[s->tPos];                                          \
+    cccc = (uint8_t)(s->tPos & 0xffU);                                 \
     s->tPos >>= 8;
 
-#define BZ_GET_FAST_C(cccc)                                                   \
-    /* c_tPos is unsigned, hence test < 0 is pointless. */                    \
-    if (c_tPos >= (uint32_t)100000 * (uint32_t)ro_blockSize100k) return true; \
-    c_tPos = c_tt[c_tPos];                                                    \
-    cccc = (uint8_t)(c_tPos & 0xff);                                          \
+#define BZ_GET_FAST_C(cccc)                                           \
+    /* c_tPos is unsigned, hence test < 0 is pointless. */            \
+    if (c_tPos >= (uint32_t)(100000 * ro_blockSize100k)) return true; \
+    c_tPos = c_tt[c_tPos];                                            \
+    cccc = (uint8_t)(c_tPos & 0xffU);                                 \
     c_tPos >>= 8;
 
 #define SET_LL4(i,n)                                                \
    { if (((i) & 0x1) == 0)                                          \
-        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & 0xf0) | (n); else    \
-        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & 0x0f) | ((n) << 4);  \
+        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & 0xf0U) | (n); else   \
+        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & 0x0fU) | ((n) << 4); \
    }
 
 #define GET_LL4(i)                             \
@@ -441,10 +441,10 @@ typedef
 #define GET_LL(i) \
    (((uint32_t)s->ll16[i]) | (GET_LL4(i) << 16))
 
-#define BZ_GET_SMALL(cccc)                                                     \
-    /* c_tPos is unsigned, hence test < 0 is pointless. */                     \
-    if (s->tPos >= (uint32_t)100000 * (uint32_t)s->blockSize100k) return true; \
-    cccc = BZ2_indexIntoF ( s->tPos, s->cftab );                               \
+#define BZ_GET_SMALL(cccc)                                             \
+    /* c_tPos is unsigned, hence test < 0 is pointless. */             \
+    if (s->tPos >= (uint32_t)(100000 * s->blockSize100k)) return true; \
+    cccc = BZ2_indexIntoF ( s->tPos, s->cftab );                       \
     s->tPos = GET_LL(s->tPos);
 
 

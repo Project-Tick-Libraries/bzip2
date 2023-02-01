@@ -169,7 +169,7 @@ static BitStream* bsOpenWriteStream ( FILE* stream )
 static void bsPutBit ( BitStream* bs, int32_t bit )
 {
    if (bs->buffLive == 8) {
-      int32_t retVal = putc ( (uint8_t) bs->buffer, bs->handle );
+      int32_t retVal = putc ( bs->buffer, bs->handle );
       if (retVal == EOF) writeError();
       bytesOut++;
       bs->buffLive = 1;
@@ -213,7 +213,7 @@ static void bsClose ( BitStream* bs )
          bs->buffLive++;
          bs->buffer <<= 1;
       };
-      retVal = putc ( (uint8_t) (bs->buffer), bs->handle );
+      retVal = putc ( bs->buffer, bs->handle );
       if (retVal == EOF) writeError();
       bytesOut++;
       retVal = fflush ( bs->handle );
