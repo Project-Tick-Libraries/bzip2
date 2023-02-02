@@ -501,14 +501,11 @@ void sendMTFValues ( EState* s )
       }
 
       nBytes = s->numZ;
-      for (i = 0; i < 16; i++)
-         if (inUse16[i]) bsW(s,1,1U); else bsW(s,1,0U);
+      for (i = 0; i < 16; i++) bsW(s, 1, (uint32_t)inUse16[i]);
 
       for (i = 0; i < 16; i++)
          if (inUse16[i])
-            for (j = 0; j < 16; j++) {
-               if (s->inUse[i * 16 + j]) bsW(s,1,1U); else bsW(s,1,0U);
-            }
+            for (j = 0; j < 16; j++) bsW(s, 1, (uint32_t)(s->inUse[i * 16 + j]));
 
       if (s->verbosity >= 3)
          VPrintf( "      bytes: mapping %d, ", s->numZ-nBytes );
