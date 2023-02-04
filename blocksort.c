@@ -135,7 +135,7 @@ void fallbackQSort3 ( uint32_t*       fmap,
       while (true) {
          while (true) {
             if (unLo > unHi) break;
-            n = (int32_t)eclass[fmap[unLo]] - (int32_t)med;
+            n = (int32_t)(eclass[fmap[unLo]] - med);
             if (n == 0) {
                fswap(fmap[unLo], fmap[ltLo]);
                ltLo++; unLo++;
@@ -146,7 +146,7 @@ void fallbackQSort3 ( uint32_t*       fmap,
          }
          while (true) {
             if (unLo > unHi) break;
-            n = (int32_t)eclass[fmap[unHi]] - (int32_t)med;
+            n = (int32_t)(eclass[fmap[unHi]] - med);
             if (n == 0) {
                fswap(fmap[unHi], fmap[gtHi]);
                gtHi--; unHi--;
@@ -988,7 +988,7 @@ void mainSort ( uint32_t* ptr,
 
       if (i < 255) {
          int32_t bbStart = (int32_t)(ftab[ss << 8] & CLEARMASK);
-         int32_t bbSize  = (int32_t)((ftab[(ss+1) << 8] & CLEARMASK) - (uint32_t)bbStart);
+         int32_t bbSize  = (int32_t)(ftab[(ss+1) << 8] & CLEARMASK) - bbStart;
          int32_t shifts  = 0;
 
          while ((bbSize >> shifts) > 65534) shifts++;
