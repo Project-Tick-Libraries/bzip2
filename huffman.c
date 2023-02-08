@@ -141,7 +141,7 @@ void BZ2_hbMakeCodeLengths ( uint8_t*       len,
 
       for (i = 1; i <= alphaSize; i++) {
          j = weight[i] >> 8;
-         j = 1 + (j / 2);
+         j = 1 + (j >> 1);
          weight[i] = j << 8;
       }
    }

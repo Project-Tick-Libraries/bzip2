@@ -181,7 +181,7 @@ static void    cleanUpAndFail        ( int32_t )     NORETURN;
 static void    compressedStreamEOF   ( void )        NORETURN;
 
 static void    copyFileName ( char*, const char* );
-static void*   myMalloc     ( int32_t );
+static void*   myCalloc     ( size_t );
 static void    applySavedFileAttrToOutputFile ( int fd );
 
 
@@ -270,7 +270,7 @@ void compressStream ( FILE* stream, FILE* zStream )
    while (true) {
 
       if (myfeof(stream)) break;
-      nIbuf = fread ( ibuf, sizeof(uint8_t), 5000U, stream );
+      nIbuf = (int32_t)fread ( ibuf, sizeof(uint8_t), 5000U, stream );
       if (ferror(stream)) goto errhandler_io;
       if (nIbuf > 0) BZ2_bzWrite ( &bzerr, bzf, (void*)ibuf, nIbuf );
       if (bzerr != BZ_OK) goto errhandler;
@@ -424,7 +424,7 @@ trycat:
       rewind(zStream);
       while (true) {
          if (myfeof(zStream)) break;
-         nread = fread ( obuf, sizeof(uint8_t), 5000U, zStream );
+         nread = (int32_t)fread ( obuf, sizeof(uint8_t), 5000U, zStream );
          if (ferror(zStream)) goto errhandler_io;
          if (nread > 0) fwrite ( obuf, sizeof(uint8_t), (size_t)nread, stream );
          if (ferror(stream)) goto errhandler_io;
@@ -1625,11 +1625,11 @@ typedef
 
 /*---------------------------------------------*/
 static
-void *myMalloc ( int32_t n )
+void *myCalloc ( size_t n )
 {
    void* p;
 
-   p = malloc ( (size_t)n );
+   p = calloc ( 1, n );
    if (p == NULL) outOfMemory ();
    return p;
 }
@@ -1639,12 +1639,7 @@ void *myMalloc ( int32_t n )
 static
 Cell *mkCell ( void )
 {
-   Cell *c;
-
-   c = (Cell*) myMalloc ( sizeof ( Cell ) );
-   c->name = NULL;
-   c->link = NULL;
-   return c;
+   return (Cell*) myCalloc ( sizeof ( Cell ) );
 }
 
 
@@ -1654,7 +1649,7 @@ Cell *snocString ( Cell* root, const char* name )
 {
    if (root == NULL) {
       Cell *tmp = mkCell();
-      tmp->name = (char*) myMalloc ( 5 + strlen(name) );
+      tmp->name = (char*) myCalloc ( 5 + strlen(name) );
       strcpy ( tmp->name, name );
       return tmp;
    } else {

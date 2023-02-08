@@ -123,7 +123,7 @@ void fallbackQSort3 ( uint32_t*       fmap,
          7621 and 32768 is taken from Sedgewick's algorithms
          book, chapter 35.
       */
-      r = ((r * 7621U) + 1U) % 32768U;
+      r = ((r * 7621U) + 1U) & 0x7FFFU;  /* % 32768U; */
       r3 = r % 3U;
       if (r3 == 0U) med = eclass[fmap[lo]]; else
       if (r3 == 1U) med = eclass[fmap[(lo+hi)>>1]]; else
@@ -215,7 +215,7 @@ void fallbackSort ( uint32_t* fmap,
                     int32_t   nblock,
                     int32_t   verb )
 {
-   int32_t  ftab[257];
+   int32_t  ftab[257] = {0};
    int32_t  ftabCopy[256];
    int32_t  H, i, j, k, l, r, cc, cc1;
    int32_t  nNotDone;
@@ -228,7 +228,6 @@ void fallbackSort ( uint32_t* fmap,
    --*/
    if (verb >= 4)
       VPrintf ( "        bucket sorting ...\n" );
-   for (i = 0; i < 257;    i++) ftab[i] = 0;
    for (i = 0; i < nblock; i++) ftab[eclass8[i]]++;
    for (i = 0; i < 256;    i++) ftabCopy[i] = ftab[i];
    for (i = 1; i < 257;    i++) ftab[i] += ftab[i-1];
@@ -240,7 +239,7 @@ void fallbackSort ( uint32_t* fmap,
       fmap[k] = i;
    }
 
-   nBhtab = 2 + (nblock / 32);
+   nBhtab = 2 + (nblock >> 5);
    for (i = 0; i < nBhtab; i++) bhtab[i] = 0U;
    for (i = 0; i < 256; i++) SET_BH(ftab[i]);
 
@@ -252,8 +251,9 @@ void fallbackSort ( uint32_t* fmap,
 
    /*-- set sentinel bits for block-end detection --*/
    for (i = 0; i < 32; i++) {
-      SET_BH(nblock + 2*i);
-      CLEAR_BH(nblock + 2*i + 1);
+      int32_t base = nblock + (i << 1);
+      SET_BH(base);
+      CLEAR_BH(base + 1);
    }
 
    /*-- the log(N) loop --*/
@@ -308,7 +308,7 @@ void fallbackSort ( uint32_t* fmap,
       if (verb >= 4)
          VPrintf ( "%6d unresolved strings\n", nNotDone );
 
-      H *= 2;
+      H <<= 1;
       if (H > nblock || nNotDone == 0) break;
    }
 
@@ -583,11 +583,8 @@ inline
 uint8_t mmed3 ( uint8_t a, uint8_t b, uint8_t c )
 {
    uint8_t t;
-   if (a > b) { t = a; a = b; b = t; };
-   if (b > c) {
-      b = c;
-      if (a > b) b = a;
-   }
+   if (a > b) { t = a; a = b; b = t; }
+   if (b > c) b = (a > b) ? a : c;
    return b;
 }
 
@@ -758,7 +755,7 @@ void mainSort ( uint32_t* ptr,
 {
    int32_t  i, j, k, ss, sb;
    int32_t  runningOrder[256];
-   bool     bigDone[256];
+   bool     bigDone[256] = {false};
    int32_t  copyStart[256];
    int32_t  copyEnd  [256];
    uint8_t  c1;
@@ -835,7 +832,6 @@ void mainSort ( uint32_t* ptr,
       big bucket.
    --*/
    for (i = 0; i <= 255; i++) {
-      bigDone     [i] = false;
       runningOrder[i] = i;
    }
 
@@ -917,8 +913,9 @@ void mainSort ( uint32_t* ptr,
       --*/
       {
          for (j = 0; j <= 255; j++) {
-            copyStart[j] = (int32_t)(ftab[(j << 8) + ss]      & CLEARMASK);
-            copyEnd  [j] = (int32_t)((ftab[(j << 8) + ss + 1] & CLEARMASK) - 1U);
+            int32_t base = (j << 8) + ss;
+            copyStart[j] = (int32_t)(ftab[base]      & CLEARMASK);
+            copyEnd  [j] = (int32_t)((ftab[base + 1] & CLEARMASK) - 1U);
          }
          for (j = (int32_t)(ftab[ss << 8] & CLEARMASK); j < copyStart[ss]; j++) {
             k = ptr[j]-1; if (k < 0) k += nblock;

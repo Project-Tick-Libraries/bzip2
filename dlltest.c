@@ -112,9 +112,9 @@ int main(int argc,char *argv[])
       fn_w = NULL;
    }
    {
-      int len;
+      int  len;
       char buff[0x1000];
-      char mode[10];
+      char mode[3] = "w0";
 
       if(decompress){
          BZFILE *BZ2fp_r = NULL;
@@ -152,16 +152,14 @@ int main(int argc,char *argv[])
          }else{
             fp_r = stdin;
          }
-         mode[0]='w';
-         mode[1] = '0' + level;
-         mode[2] = '\0';
+         mode[1] += level;
 
          if((fn_w == NULL && (BZ2fp_w = BZ2_bzdopen(fileno(stdout),mode))==NULL)
             || (fn_w !=NULL && (BZ2fp_w = BZ2_bzopen(fn_w,mode))==NULL)){
             printf("can't bz2openstream\n");
             exit(1);
          }
-         while((len=fread(buff,1U,0x1000U,fp_r))>0){
+         while((len=(int)fread(buff,1U,0x1000U,fp_r))>0){
             BZ2_bzwrite(BZ2fp_w,buff,len);
          }
          BZ2_bzclose(BZ2fp_w);

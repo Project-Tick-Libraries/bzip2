@@ -25,11 +25,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifndef BZ_NO_STDIO
 #include <stdio.h>
 #include <ctype.h>
-#include <string.h>
 #endif
 
 #include "bzlib.h"

@@ -1093,7 +1093,7 @@ opaque, p )</computeroutput> should free that memory.</para>
 <computeroutput>bzfree</computeroutput> and
 <computeroutput>opaque</computeroutput> to
 <computeroutput>NULL</computeroutput>, and the library will then
-use the standard <computeroutput>malloc</computeroutput> /
+use the standard <computeroutput>calloc</computeroutput> /
 <computeroutput>free</computeroutput> routines.</para>
 
 <para>Before calling
@@ -1441,7 +1441,7 @@ allocated and initialised before the call.  Fields
 <computeroutput>opaque</computeroutput> should be set if a custom
 memory allocator is required, or made
 <computeroutput>NULL</computeroutput> for the normal
-<computeroutput>malloc</computeroutput> /
+<computeroutput>calloc</computeroutput> /
 <computeroutput>free</computeroutput> routines.  Upon return, the
 internal state will have been initialised, and
 <computeroutput>total_in</computeroutput> and
@@ -1672,7 +1672,7 @@ general points.</para>
   platforms.</para></listitem>
 
  <listitem><para>Memory allocation requests are handled by
-  <computeroutput>malloc</computeroutput> /
+  <computeroutput>calloc</computeroutput> /
   <computeroutput>free</computeroutput>.  At present there is no
   facility for user-defined memory allocators in the file I/O
   functions (could easily be added, though).</para></listitem>

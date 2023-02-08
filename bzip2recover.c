@@ -97,10 +97,10 @@ static void writeError ( void )
 
 
 /*---------------------------------------------*/
-static void mallocFail ( int32_t n )
+static void callocFail ( int32_t n )
 {
    fprintf ( stderr,
-             "%s: malloc failed on request for %d bytes.\n",
+             "%s: calloc failed on request for %d bytes.\n",
             progName, n );
    fprintf ( stderr, "%s: warning: output file(s) may be incomplete.\n",
              progName );
@@ -142,11 +142,9 @@ typedef
 /*---------------------------------------------*/
 static BitStream* bsOpenReadStream ( FILE* stream )
 {
-   BitStream *bs = malloc ( sizeof(BitStream) );
-   if (bs == NULL) mallocFail ( sizeof(BitStream) );
+   BitStream *bs = calloc ( 1, sizeof(BitStream) );
+   if (bs == NULL) callocFail ( sizeof(BitStream) );
    bs->handle = stream;
-   bs->buffer = 0;
-   bs->buffLive = 0;
    bs->mode = 'r';
    return bs;
 }
@@ -155,11 +153,9 @@ static BitStream* bsOpenReadStream ( FILE* stream )
 /*---------------------------------------------*/
 static BitStream* bsOpenWriteStream ( FILE* stream )
 {
-   BitStream *bs = malloc ( sizeof(BitStream) );
-   if (bs == NULL) mallocFail ( sizeof(BitStream) );
+   BitStream *bs = calloc ( 1, sizeof(BitStream) );
+   if (bs == NULL) callocFail ( sizeof(BitStream) );
    bs->handle = stream;
-   bs->buffer = 0;
-   bs->buffLive = 0;
    bs->mode = 'w';
    return bs;
 }
@@ -462,8 +458,7 @@ int main ( int argc, char** argv )
             (31.10.2001 by Sergey E. Kusikov) */
          char*   split;
          int32_t ofs, k;
-         for (k = 0; k < BZ_MAX_FILENAME; k++)
-            outFileName[k] = 0;
+         memset (outFileName, 0, BZ_MAX_FILENAME * sizeof(char));
          strcpy (outFileName, inFileName);
          split = strrchr (outFileName, BZ_SPLIT_SYM);
          if (split == NULL) {

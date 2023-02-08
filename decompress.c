@@ -262,19 +262,19 @@ int32_t BZ2_decompress ( DState* s )
       /*--- Receive the mapping table ---*/
       for (i = 0; i < 16; i++) {
          GET_BIT(BZ_X_MAPPING_1, uc);
-         if (uc == 1U)
-            s->inUse16[i] = true; else
-            s->inUse16[i] = false;
+         s->inUse16[i] = (uc == 1U);
       }
 
-      for (i = 0; i < 256; i++) s->inUse[i] = false;
+      memset (s->inUse, 0, 256U * sizeof(bool));
 
       for (i = 0; i < 16; i++)
-         if (s->inUse16[i])
+         if (s->inUse16[i]) {
+            int32_t base = i << 4;
             for (j = 0; j < 16; j++) {
                GET_BIT(BZ_X_MAPPING_2, uc);
-               if (uc == 1U) s->inUse[i * 16 + j] = true;
+               if (uc == 1U) s->inUse[base + j] = true;
             }
+         }
       makeMaps_d ( s );
       if (s->nInUse == 0) RETURN(BZ_DATA_ERROR);
       alphaSize = s->nInUse+2;
@@ -355,7 +355,7 @@ int32_t BZ2_decompress ( DState* s )
       groupNo  = -1;
       groupPos = 0;
 
-      for (i = 0; i <= 255; i++) s->unzftab[i] = 0;
+      memset (s->unzftab, 0, 256U * sizeof(int32_t));
 
       /*-- MTF init --*/
       {
@@ -389,10 +389,10 @@ int32_t BZ2_decompress ( DState* s )
                   the initial RLE), viz, 900k, so bounding N at 2
                   million should guard against overflow without
                   rejecting any legitimate inputs. */
-               if (N >= 2*1024*1024) RETURN(BZ_DATA_ERROR);
-               if (nextSym == BZ_RUNA) es = es + (0+1) * N; else
-               if (nextSym == BZ_RUNB) es = es + (1+1) * N;
-               N = N * 2;
+               if (N >= 0x200000) RETURN(BZ_DATA_ERROR);
+               if (nextSym == BZ_RUNA) es += N; else
+               if (nextSym == BZ_RUNB) es += N << 1;
+               N <<= 1;
                GET_MTF_VAL(BZ_X_MTF_3, BZ_X_MTF_4, nextSym);
             }
                while (nextSym == BZ_RUNA || nextSym == BZ_RUNB);

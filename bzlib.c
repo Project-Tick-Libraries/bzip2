@@ -915,18 +915,13 @@ BZFILE* BZ_API(BZ2_bzWriteOpen)
    if (ferror(f))
       { BZ_SETERR(BZ_IO_ERROR); return NULL; };
 
-   bzf = malloc ( sizeof(bzFile) );
+   bzf = calloc ( 1, sizeof(bzFile) );
    if (bzf == NULL)
       { BZ_SETERR(BZ_MEM_ERROR); return NULL; };
 
    BZ_SETERR(BZ_OK);
-   bzf->initialisedOk = false;
-   bzf->bufN          = 0;
-   bzf->handle        = f;
-   bzf->writing       = true;
-   bzf->strm.bzalloc  = NULL;
-   bzf->strm.bzfree   = NULL;
-   bzf->strm.opaque   = NULL;
+   bzf->handle  = f;
+   bzf->writing = true;
 
    if (workFactor == 0) workFactor = 30;
    ret = BZ2_bzCompressInit ( &(bzf->strm), blockSize100k,
@@ -974,8 +969,8 @@ void BZ_API(BZ2_bzWrite)
 
       if (bzf->strm.avail_out < BZ_MAX_UNUSED) {
          n = BZ_MAX_UNUSED - bzf->strm.avail_out;
-         n2 = fwrite ( (void*)(bzf->buf), sizeof(uint8_t),
-                       (size_t)n, bzf->handle );
+         n2 = (int32_t)fwrite ( (void*)(bzf->buf), sizeof(uint8_t),
+                                (size_t)n, bzf->handle );
          if (n != n2 || ferror(bzf->handle))
             { BZ_SETERR(BZ_IO_ERROR); return; };
       }
@@ -1033,8 +1028,8 @@ void BZ_API(BZ2_bzWriteClose64)
 
          if (bzf->strm.avail_out < BZ_MAX_UNUSED) {
             n = BZ_MAX_UNUSED - bzf->strm.avail_out;
-            n2 = fwrite ( (void*)(bzf->buf), sizeof(uint8_t),
-                          (size_t)n, bzf->handle );
+            n2 = (int32_t)fwrite ( (void*)(bzf->buf), sizeof(uint8_t),
+                                   (size_t)n, bzf->handle );
             if (n != n2 || ferror(bzf->handle))
                { BZ_SETERR(BZ_IO_ERROR); return; };
          }
@@ -1088,19 +1083,13 @@ BZFILE* BZ_API(BZ2_bzReadOpen)
    if (ferror(f))
       { BZ_SETERR(BZ_IO_ERROR); return NULL; };
 
-   bzf = malloc ( sizeof(bzFile) );
+   bzf = calloc ( 1, sizeof(bzFile) );
    if (bzf == NULL)
       { BZ_SETERR(BZ_MEM_ERROR); return NULL; };
 
    BZ_SETERR(BZ_OK);
 
-   bzf->initialisedOk = false;
-   bzf->handle        = f;
-   bzf->bufN          = 0;
-   bzf->writing       = false;
-   bzf->strm.bzalloc  = NULL;
-   bzf->strm.bzfree   = NULL;
-   bzf->strm.opaque   = NULL;
+   bzf->handle = f;
 
    while (nUnused > 0) {
       bzf->buf[bzf->bufN] = *((uint8_t*)(unused)); bzf->bufN++;
@@ -1168,8 +1157,8 @@ int BZ_API(BZ2_bzRead)
          { BZ_SETERR(BZ_IO_ERROR); return 0; };
 
       if (bzf->strm.avail_in == 0U && !myfeof(bzf->handle)) {
-         n = fread ( bzf->buf, sizeof(uint8_t),
-                     (size_t)BZ_MAX_UNUSED, bzf->handle );
+         n = (int32_t)fread ( bzf->buf, sizeof(uint8_t),
+                              (size_t)BZ_MAX_UNUSED, bzf->handle );
          if (ferror(bzf->handle))
             { BZ_SETERR(BZ_IO_ERROR); return 0; };
          bzf->bufN = n;

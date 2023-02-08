@@ -63,8 +63,8 @@ static char *bzerrorstrings[] = {
 
 void flip_bit ( int bit )
 {
-   int byteno = bit / 8;
-   int bitno  = bit % 8;
+   int byteno = bit >> 3;
+   int bitno  = bit & 0x7;
    uchar mask = 1U << bitno;
    zbuf[byteno] ^= mask;
 }
@@ -87,7 +87,7 @@ int main ( int argc, char** argv )
       return 1;
    }
 
-   nIn = fread ( inbuf, 1U, (size_t)M_BLOCK, f );
+   nIn = (int)fread ( inbuf, 1U, (size_t)M_BLOCK, f );
    fprintf ( stderr, "%d bytes read\n", nIn );
 
    nZ = M_BLOCK;
@@ -97,7 +97,7 @@ int main ( int argc, char** argv )
    assert (r == BZ_OK);
    fprintf ( stderr, "%d after compression\n", nZ );
 
-   for (bit = 0; bit < nZ*8; bit++) {
+   for (bit = 0; bit < (nZ << 3); bit++) {
       fprintf ( stderr, "bit %d  ", bit );
       flip_bit ( bit );
       nOut = M_BLOCK_OUT;

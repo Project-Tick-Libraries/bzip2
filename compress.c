@@ -55,24 +55,16 @@ void bsFinishWrite ( EState* s )
 
 
 /*---------------------------------------------------*/
-#define bsNEEDW(nz)                           \
-{                                             \
-   while (s->bsLive >= 8) {                   \
-      s->zbits[s->numZ]                       \
-         = (uint8_t)(s->bsBuff >> 24);        \
-      s->numZ++;                              \
-      s->bsBuff <<= 8;                        \
-      s->bsLive -= 8;                         \
-   }                                          \
-}
-
-
-/*---------------------------------------------------*/
 static
 inline
 void bsW ( EState* s, int32_t n, uint32_t v )
 {
-   bsNEEDW ( n );
+   while (s->bsLive >= 8) {
+      s->zbits[s->numZ] = (uint8_t)(s->bsBuff >> 24);
+      s->numZ++;
+      s->bsBuff <<= 8;
+      s->bsLive -= 8;
+   }
    s->bsBuff |= (v << (32 - s->bsLive - n));
    s->bsLive += n;
 }
@@ -182,7 +174,7 @@ void generateMTFValues ( EState* s )
                   s->mtfFreq[BZ_RUNA]++;
                }
                if (zPend < 2) break;
-               zPend = (zPend - 2) / 2;
+               zPend = (zPend - 2) >> 1;
             };
             zPend = 0;
          }
@@ -220,7 +212,7 @@ void generateMTFValues ( EState* s )
             s->mtfFreq[BZ_RUNA]++;
          }
          if (zPend < 2) break;
-         zPend = (zPend - 2) / 2;
+         zPend = (zPend - 2) >> 1;
       };
       zPend = 0;
    }
@@ -435,7 +427,7 @@ void sendMTFValues ( EState* s )
       }
       if (s->verbosity >= 3) {
          VPrintf ( "      pass %d: size is %d, grp uses are ",
-                   iter+1, totc/8 );
+                   iter+1, totc >> 3 );
          for (t = 0; t < nGroups; t++)
             VPrintf ( "%d ", fave[t] );
          VPrintf ( "\n" );
@@ -493,19 +485,21 @@ void sendMTFValues ( EState* s )
 
    /*--- Transmit the mapping table. ---*/
    {
-      bool inUse16[16];
+      bool inUse16[16] = {false};
       for (i = 0; i < 16; i++) {
-          inUse16[i] = false;
+          int32_t base = i << 4;
           for (j = 0; j < 16; j++)
-             if (s->inUse[i * 16 + j]) inUse16[i] = true;
+             if (s->inUse[base + j]) inUse16[i] = true;
       }
 
       nBytes = s->numZ;
       for (i = 0; i < 16; i++) bsW(s, 1, (uint32_t)inUse16[i]);
 
       for (i = 0; i < 16; i++)
-         if (inUse16[i])
-            for (j = 0; j < 16; j++) bsW(s, 1, (uint32_t)(s->inUse[i * 16 + j]));
+         if (inUse16[i]) {
+            int32_t base = i << 4;
+            for (j = 0; j < 16; j++) bsW(s, 1, (uint32_t)(s->inUse[base + j]));
+         }
 
       if (s->verbosity >= 3)
          VPrintf( "      bytes: mapping %d, ", s->numZ-nBytes );
