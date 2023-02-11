@@ -458,7 +458,7 @@ int main ( int argc, char** argv )
             (31.10.2001 by Sergey E. Kusikov) */
          char*   split;
          int32_t ofs, k;
-         memset (outFileName, 0, BZ_MAX_FILENAME * sizeof(char));
+         memset (outFileName, 0, (size_t)BZ_MAX_FILENAME * sizeof(char));
          strcpy (outFileName, inFileName);
          split = strrchr (outFileName, BZ_SPLIT_SYM);
          if (split == NULL) {

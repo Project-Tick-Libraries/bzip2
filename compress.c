@@ -146,7 +146,7 @@ void generateMTFValues ( EState* s )
    makeMaps_e ( s );
    EOB = s->nInUse+1;
 
-   for (i = 0; i <= EOB; i++) s->mtfFreq[i] = 0;
+   memset(s->mtfFreq, 0, (size_t)EOB * sizeof(int32_t));
 
    wr = 0;
    zPend = 0;
@@ -313,7 +313,7 @@ void sendMTFValues ( EState* s )
    ---*/
    for (iter = 0; iter < BZ_N_ITERS; iter++) {
 
-      for (t = 0; t < nGroups; t++) fave[t] = 0;
+      memset(fave, 0, (size_t)nGroups *sizeof(int32_t));
 
       for (t = 0; t < nGroups; t++)
          for (v = 0; v < alphaSize; v++)
