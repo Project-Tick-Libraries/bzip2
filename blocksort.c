@@ -219,7 +219,7 @@ void fallbackSort ( uint32_t* fmap,
    int32_t  ftabCopy[256];
    int32_t  H, i, j, k, l, r, cc, cc1;
    int32_t  nNotDone;
-   int32_t  nBhtab;
+   uint32_t nBhtab;
    uint8_t* eclass8 = (uint8_t*)eclass;
 
    /*--
@@ -239,8 +239,8 @@ void fallbackSort ( uint32_t* fmap,
       fmap[k] = i;
    }
 
-   nBhtab = 2 + (nblock >> 5);
-   for (i = 0; i < nBhtab; i++) bhtab[i] = 0U;
+   nBhtab = (uint32_t)(2 + (nblock >> 5));
+   memset (bhtab, 0, nBhtab * sizeof(int32_t));
    for (i = 0; i < 256; i++) SET_BH(ftab[i]);
 
    /*--
@@ -764,7 +764,7 @@ void mainSort ( uint32_t* ptr,
    if (verb >= 4) VPrintf ( "        main sort initialise ...\n" );
 
    /*-- set up the 2-byte frequency table --*/
-   for (i = 65536; i >= 0; i--) ftab[i] = 0U;
+   memset (ftab, 0, 65537 * sizeof(uint32_t));
 
    j = (int32_t)(block[0] << 8);
    i = nblock-1;

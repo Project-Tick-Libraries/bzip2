@@ -146,7 +146,7 @@ void generateMTFValues ( EState* s )
    makeMaps_e ( s );
    EOB = s->nInUse+1;
 
-   memset(s->mtfFreq, 0, (size_t)EOB * sizeof(int32_t));
+   memset (s->mtfFreq, 0, (size_t)EOB * sizeof(int32_t));
 
    wr = 0;
    zPend = 0;
@@ -255,10 +255,9 @@ void sendMTFValues ( EState* s )
                 "%d+2 syms in use\n",
                 s->nblock, s->nMTF, s->nInUse );
 
-   alphaSize = s->nInUse+2;
+   alphaSize = s->nInUse + 2;
    for (t = 0; t < BZ_N_GROUPS; t++)
-      for (v = 0; v < alphaSize; v++)
-         s->len[t][v] = BZ_GREATER_ICOST;
+      memset (s->len[t], BZ_GREATER_ICOST, alphaSize);
 
    /*--- Decide how many coding tables to use ---*/
    AssertH ( s->nMTF > 0, 3001 );
@@ -313,11 +312,10 @@ void sendMTFValues ( EState* s )
    ---*/
    for (iter = 0; iter < BZ_N_ITERS; iter++) {
 
-      memset(fave, 0, (size_t)nGroups *sizeof(int32_t));
+      memset (fave, 0, (size_t)nGroups * sizeof(int32_t));
 
       for (t = 0; t < nGroups; t++)
-         for (v = 0; v < alphaSize; v++)
-            s->rfreq[t][v] = 0;
+         memset (s->rfreq[t], 0, alphaSize * sizeof(int32_t));
 
       /*---
         Set up an auxiliary length table which is used to fast-track
@@ -345,7 +343,7 @@ void sendMTFValues ( EState* s )
             Calculate the cost of this group as coded
             by each of the coding tables.
          --*/
-         for (t = 0; t < nGroups; t++) cost[t] = 0U;
+         memset (cost, 0, nGroups * sizeof(uint16_t));
 
          if (nGroups == 6 && 50 == ge-gs+1) {
             /*--- fast track the common case ---*/

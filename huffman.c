@@ -182,12 +182,12 @@ void BZ2_hbCreateDecodeTables ( int32_t*       limit,
       for (j = 0; j < alphaSize; j++)
          if (length[j] == i) { perm[pp] = j; pp++; };
 
-   memset(base, 0, (size_t)BZ_MAX_CODE_LEN * sizeof(int32_t));
+   memset (base, 0, (size_t)BZ_MAX_CODE_LEN * sizeof(int32_t));
    for (i = 0; i < alphaSize; i++) base[length[i]+1]++;
 
    for (i = 1; i < BZ_MAX_CODE_LEN; i++) base[i] += base[i-1];
 
-   memset(limit, 0, (size_t)BZ_MAX_CODE_LEN * sizeof(int32_t));
+   memset (limit, 0, (size_t)BZ_MAX_CODE_LEN * sizeof(int32_t));
    vec = 0;
 
    for (i = minLen; i <= maxLen; i++) {
