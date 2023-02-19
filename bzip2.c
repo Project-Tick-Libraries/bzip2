@@ -389,7 +389,7 @@ bool uncompressStream ( FILE* zStream, FILE* stream )
       if (bzerr != BZ_OK) panic ( "decompress:bzReadGetUnused" );
 
       unusedTmp = (uint8_t*)unusedTmpV;
-      for (i = 0; i < nUnused; i++) unused[i] = unusedTmp[i];
+      memcpy (unused, unusedTmp, (size_t)nUnused);
 
       BZ2_bzReadClose ( &bzerr, bzf );
       if (bzerr != BZ_OK) panic ( "decompress:bzReadGetUnused" );
@@ -504,7 +504,7 @@ bool testStream ( FILE* zStream )
       if (bzerr != BZ_OK) panic ( "test:bzReadGetUnused" );
 
       unusedTmp = (uint8_t*)unusedTmpV;
-      for (i = 0; i < nUnused; i++) unused[i] = unusedTmp[i];
+      memcpy (unused, unusedTmp, (size_t)nUnused);
 
       BZ2_bzReadClose ( &bzerr, bzf );
       if (bzerr != BZ_OK) panic ( "test:bzReadGetUnused" );
@@ -856,7 +856,7 @@ void copyFileName ( char* to, const char* from )
       exit(exitValue);
    }
 
-  strncpy(to,from,FILE_NAME_LEN-10);
+  strncpy (to,from,FILE_NAME_LEN-10);
   to[FILE_NAME_LEN-10]='\0';
 }
 
@@ -1680,7 +1680,7 @@ void addFlagsFromEnvVar ( Cell** argList, const char* varName )
          while (p[i] != 0 && !isspace((int32_t)(p[i]))) i++;
          if (i > 0) {
             k = i; if (k > FILE_NAME_LEN-10) k = FILE_NAME_LEN-10;
-            for (j = 0; j < k; j++) tmpName[j] = p[j];
+            strncpy (tmpName, p, k);
             tmpName[k] = 0;
             APPEND_FLAG(*argList, tmpName);
          }

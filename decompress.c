@@ -501,7 +501,7 @@ int32_t BZ2_decompress ( DState* s )
       }
       /* Actually generate cftab. */
       s->cftab[0] = 0;
-      for (i = 1; i <= 256; i++) s->cftab[i] = s->unzftab[i-1];
+      memcpy (&(s->cftab[1]), s->unzftab, 256U * sizeof(int32_t));
       for (i = 1; i <= 256; i++) s->cftab[i] += s->cftab[i-1];
       /* Check: cftab entries in range. */
       for (i = 0; i <= 256; i++) {
@@ -526,7 +526,7 @@ int32_t BZ2_decompress ( DState* s )
       if (s->smallDecompress) {
 
          /*-- Make a copy of cftab, used in generation of T --*/
-         for (i = 0; i <= 256; i++) s->cftabCopy[i] = s->cftab[i];
+         memcpy (s->cftabCopy, s->cftab, 256U * sizeof(int32_t));
 
          /*-- compute the T vector --*/
          for (i = 0; i < nblock; i++) {

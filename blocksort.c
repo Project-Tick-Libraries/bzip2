@@ -229,7 +229,7 @@ void fallbackSort ( uint32_t* fmap,
    if (verb >= 4)
       VPrintf ( "        bucket sorting ...\n" );
    for (i = 0; i < nblock; i++) ftab[eclass8[i]]++;
-   for (i = 0; i < 256;    i++) ftabCopy[i] = ftab[i];
+   memcpy (ftabCopy, ftab, 256U * sizeof(int32_t));
    for (i = 1; i < 257;    i++) ftab[i] += ftab[i-1];
 
    for (i = 0; i < nblock; i++) {
