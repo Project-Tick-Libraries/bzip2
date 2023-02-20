@@ -46,8 +46,7 @@ static
 void bsFinishWrite ( EState* s )
 {
    while (s->bsLive > 0) {
-      s->zbits[s->numZ] = (uint8_t)(s->bsBuff >> 24);
-      s->numZ++;
+      s->zbits[s->numZ++] = (uint8_t)(s->bsBuff >> 24);
       s->bsBuff <<= 8;
       s->bsLive -= 8;
    }
@@ -60,8 +59,7 @@ inline
 void bsW ( EState* s, int32_t n, uint32_t v )
 {
    while (s->bsLive >= 8) {
-      s->zbits[s->numZ] = (uint8_t)(s->bsBuff >> 24);
-      s->numZ++;
+      s->zbits[s->numZ++] = (uint8_t)(s->bsBuff >> 24);
       s->bsBuff <<= 8;
       s->bsLive -= 8;
    }
@@ -101,8 +99,7 @@ void makeMaps_e ( EState* s )
    s->nInUse = 0;
    for (i = 0; i < 256; i++)
       if (s->inUse[i]) {
-         s->unseqToSeq[i] = s->nInUse;
-         s->nInUse++;
+         s->unseqToSeq[i] = s->nInUse++;
       }
 }
 
@@ -166,13 +163,9 @@ void generateMTFValues ( EState* s )
          if (zPend > 0) {
             zPend--;
             while (true) {
-               if (zPend & 1) {
-                  mtfv[wr] = BZ_RUNB; wr++;
-                  s->mtfFreq[BZ_RUNB]++;
-               } else {
-                  mtfv[wr] = BZ_RUNA; wr++;
-                  s->mtfFreq[BZ_RUNA]++;
-               }
+               int32_t run = (zPend & 1) ? BZ_RUNB : BZ_RUNA;
+               mtfv[wr++]  = (uint16_t)run;
+               s->mtfFreq[run]++;
                if (zPend < 2) break;
                zPend = (zPend - 2) >> 1;
             };
@@ -195,7 +188,7 @@ void generateMTFValues ( EState* s )
             };
             yy[0] = rtmp;
             j = ryy_j - &(yy[0]);
-            mtfv[wr] = j+1; wr++; s->mtfFreq[j+1]++;
+            mtfv[wr++] = j+1; s->mtfFreq[j+1]++;
          }
 
       }
@@ -204,20 +197,16 @@ void generateMTFValues ( EState* s )
    if (zPend > 0) {
       zPend--;
       while (true) {
-         if (zPend & 1) {
-            mtfv[wr] = BZ_RUNB; wr++;
-            s->mtfFreq[BZ_RUNB]++;
-         } else {
-            mtfv[wr] = BZ_RUNA; wr++;
-            s->mtfFreq[BZ_RUNA]++;
-         }
+         int32_t run = (zPend & 1) ? BZ_RUNB : BZ_RUNA;
+         mtfv[wr++]  = (uint16_t)run;
+         s->mtfFreq[run]++;
          if (zPend < 2) break;
          zPend = (zPend - 2) >> 1;
       };
       zPend = 0;
    }
 
-   mtfv[wr] = EOB; wr++; s->mtfFreq[EOB]++;
+   mtfv[wr++] = EOB; s->mtfFreq[EOB]++;
 
    s->nMTF = wr;
 }
@@ -279,15 +268,13 @@ void sendMTFValues ( EState* s )
          ge = gs-1;
          aFreq = 0;
          while (aFreq < tFreq && ge < alphaSize-1) {
-            ge++;
-            aFreq += s->mtfFreq[ge];
+            aFreq += s->mtfFreq[++ge];
          }
 
          if (ge > gs
              && nPart != nGroups && nPart != 1
              && ((nGroups-nPart) % 2 == 1)) {
-            aFreq -= s->mtfFreq[ge];
-            ge--;
+            aFreq -= s->mtfFreq[ge--];
          }
 
          if (s->verbosity >= 3)
@@ -391,8 +378,7 @@ void sendMTFValues ( EState* s )
             if (cost[t] < bc) { bc = cost[t]; bt = t; };
          totc += bc;
          fave[bt]++;
-         s->selector[nSelectors] = bt;
-         nSelectors++;
+         s->selector[nSelectors++] = bt;
 
          /*--
             Increment the symbol frequencies for the selected table.

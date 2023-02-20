@@ -220,8 +220,7 @@ void uInt64_toAscii ( char* outbuf, uint64_t* n )
    uint64_t n_copy = *n;
    do {
       q = uInt64_qrm10 ( &n_copy );
-      buf[nBuf] = q + '0';
-      nBuf++;
+      buf[nBuf++] = q + '0';
    } while (n_copy != UINT64_C(0));
    outbuf[nBuf] = 0;
    for (i = 0; i < nBuf; i++)
@@ -833,9 +832,9 @@ void configError ( void )
 static
 void pad ( const char* s )
 {
-   int32_t i;
-   if ( (int32_t)strlen(s) >= longestFileName ) return;
-   for (i = 1; i <= longestFileName - (int32_t)strlen(s); i++)
+   int32_t length = (int32_t)strlen(s);
+   if ( length >= longestFileName ) return;
+   for (int i = 1; i <= longestFileName - length; i++)
       fprintf ( stderr, " " );
 }
 

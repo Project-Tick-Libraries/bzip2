@@ -30,8 +30,7 @@ void makeMaps_d ( DState* s )
    s->nInUse = 0;
    for (i = 0; i < 256; i++)
       if (s->inUse[i]) {
-         s->seqToUnseq[s->nInUse] = i;
-         s->nInUse++;
+         s->seqToUnseq[s->nInUse++] = i;
       }
 }
 
@@ -309,7 +308,7 @@ int32_t BZ2_decompress ( DState* s )
          for (i = 0; i < nSelectors; i++) {
             v = s->selectorMtf[i];
             tmp = pos[v];
-            while (v > 0U) { pos[v] = pos[v-1]; v--; }
+            for (; v > 0U; v--) pos[v] = pos[v-1];
             pos[0] = tmp;
             s->selector[i] = tmp;
          }
@@ -402,18 +401,14 @@ int32_t BZ2_decompress ( DState* s )
             s->unzftab[uc] += es;
 
             if (s->smallDecompress)
-               while (es > 0) {
+               for (; es > 0; es--) {
                   if (nblock >= nblockMAX) RETURN(BZ_DATA_ERROR);
-                  s->ll16[nblock] = (uint16_t)uc;
-                  nblock++;
-                  es--;
+                  s->ll16[nblock++] = (uint16_t)uc;
                }
             else
-               while (es > 0) {
+               for (; es > 0; es--) {
                   if (nblock >= nblockMAX) RETURN(BZ_DATA_ERROR);
-                  s->tt[nblock] = (uint32_t)uc;
-                  nblock++;
-                  es--;
+                  s->tt[nblock++] = (uint32_t)uc;
                };
 
             continue;
@@ -432,17 +427,14 @@ int32_t BZ2_decompress ( DState* s )
                   /* avoid general-case expense */
                   pp = s->mtfbase[0];
                   uc = s->mtfa[pp+nn];
-                  while (nn > 3U) {
+                  for (; nn > 3U; nn -= 4U) {
                      int32_t z = pp + (int32_t)nn;
                      s->mtfa[(z)  ] = s->mtfa[(z)-1];
                      s->mtfa[(z)-1] = s->mtfa[(z)-2];
                      s->mtfa[(z)-2] = s->mtfa[(z)-3];
                      s->mtfa[(z)-3] = s->mtfa[(z)-4];
-                     nn -= 4U;
                   }
-                  while (nn > 0U) {
-                     s->mtfa[(pp+nn)] = s->mtfa[(pp+nn)-1]; nn--;
-                  };
+                  for (; nn > 0U; nn--) s->mtfa[(pp+nn)] = s->mtfa[(pp+nn)-1];
                   s->mtfa[pp] = uc;
                } else {
                   /* general case */
@@ -450,15 +442,11 @@ int32_t BZ2_decompress ( DState* s )
                   off = nn % MTFL_SIZE;
                   pp = s->mtfbase[lno] + off;
                   uc = s->mtfa[pp];
-                  while (pp > s->mtfbase[lno]) {
-                     s->mtfa[pp] = s->mtfa[pp-1]; pp--;
-                  };
+                  for (; pp > s->mtfbase[lno]; pp--) s->mtfa[pp] = s->mtfa[pp-1];
                   s->mtfbase[lno]++;
-                  while (lno > 0) {
+                  for (; lno > 0; lno--) {
                      s->mtfbase[lno]--;
-                     s->mtfa[s->mtfbase[lno]]
-                        = s->mtfa[s->mtfbase[lno-1] + MTFL_SIZE - 1];
-                     lno--;
+                     s->mtfa[s->mtfbase[lno]] = s->mtfa[s->mtfbase[lno-1] + MTFL_SIZE - 1];
                   }
                   s->mtfbase[0]--;
                   s->mtfa[s->mtfbase[0]] = uc;

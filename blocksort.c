@@ -510,7 +510,7 @@ void mainSimpleSort ( uint32_t*       ptr,
          /*-- copy 1 --*/
          if (i > hi) break;
          v = ptr[i];
-         j = i;
+         j = i++;
          while ( mainGtU (
                     ptr[j-h]+d, v+d, block, quadrant, nblock, budget
                  ) ) {
@@ -519,12 +519,11 @@ void mainSimpleSort ( uint32_t*       ptr,
             if (j <= (lo + h - 1)) break;
          }
          ptr[j] = v;
-         i++;
 
          /*-- copy 2 --*/
          if (i > hi) break;
          v = ptr[i];
-         j = i;
+         j = i++;
          while ( mainGtU (
                     ptr[j-h]+d, v+d, block, quadrant, nblock, budget
                  ) ) {
@@ -533,12 +532,11 @@ void mainSimpleSort ( uint32_t*       ptr,
             if (j <= (lo + h - 1)) break;
          }
          ptr[j] = v;
-         i++;
 
          /*-- copy 3 --*/
          if (i > hi) break;
          v = ptr[i];
-         j = i;
+         j = i++;
          while ( mainGtU (
                     ptr[j-h]+d, v+d, block, quadrant, nblock, budget
                  ) ) {
@@ -547,7 +545,6 @@ void mainSimpleSort ( uint32_t*       ptr,
             if (j <= (lo + h - 1)) break;
          }
          ptr[j] = v;
-         i++;
 
          if (*budget < 0) return;
       }
@@ -837,22 +834,18 @@ void mainSort ( uint32_t* ptr,
 
    {
       int32_t vv;
-      int32_t h = 1;
-      do h = 3 * h + 1; while (h <= 256);
-      do {
-         h = h / 3;
+      for (int32_t h = 121; h > 0; h /= 3) {
          for (i = h; i <= 255; i++) {
             vv = runningOrder[i];
             j = i;
             while ( BIGFREQ(runningOrder[j-h]) > BIGFREQ(vv) ) {
                runningOrder[j] = runningOrder[j-h];
-               j = j - h;
-               if (j <= (h - 1)) goto zero;
+               j -= h;
+               if (j <= (h - 1)) break;
             }
-            zero:
             runningOrder[j] = vv;
          }
-      } while (h != 1);
+      }
    }
 
    /*--
@@ -991,8 +984,8 @@ void mainSort ( uint32_t* ptr,
          while ((bbSize >> shifts) > 65534) shifts++;
 
          for (j = bbSize-1; j >= 0; j--) {
-            int32_t a2update     = ptr[bbStart + j];
-            uint16_t qVal        = (uint16_t)(j >> shifts);
+            int32_t a2update   = ptr[bbStart + j];
+            uint16_t qVal      = (uint16_t)(j >> shifts);
             quadrant[a2update] = qVal;
             if (a2update < BZ_N_OVERSHOOT)
                quadrant[a2update + nblock] = qVal;

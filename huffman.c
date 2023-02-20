@@ -89,9 +89,8 @@ void BZ2_hbMakeCodeLengths ( uint8_t*       len,
       parent[0] = -2;
 
       for (i = 1; i <= alphaSize; i++) {
-         parent[i] = -1;
-         nHeap++;
-         heap[nHeap] = i;
+         parent[i]     = -1;
+         heap[++nHeap] = i;
          UPHEAP(nHeap);
       }
 
@@ -160,7 +159,7 @@ void BZ2_hbAssignCodes ( int32_t*       code,
    vec = 0;
    for (n = minLen; n <= maxLen; n++) {
       for (i = 0; i < alphaSize; i++)
-         if (length[i] == n) { code[i] = vec; vec++; };
+         if (length[i] == n) { code[i] = vec++;};
       vec <<= 1;
    }
 }
@@ -180,7 +179,7 @@ void BZ2_hbCreateDecodeTables ( int32_t*       limit,
    pp = 0;
    for (i = minLen; i <= maxLen; i++)
       for (j = 0; j < alphaSize; j++)
-         if (length[j] == i) { perm[pp] = j; pp++; };
+         if (length[j] == i) { perm[pp++] = j; };
 
    memset (base, 0, (size_t)BZ_MAX_CODE_LEN * sizeof(int32_t));
    for (i = 0; i < alphaSize; i++) base[length[i]+1]++;

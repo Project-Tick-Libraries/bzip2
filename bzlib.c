@@ -216,25 +216,24 @@ void add_pair_to_block ( EState* s )
    s->inUse[s->state_in_ch] = true;
    switch (s->state_in_len) {
       case 1:
-         s->block[s->nblock] = (uint8_t)ch; s->nblock++;
+         s->block[s->nblock++] = (uint8_t)ch;
          break;
       case 2:
-         s->block[s->nblock] = (uint8_t)ch; s->nblock++;
-         s->block[s->nblock] = (uint8_t)ch; s->nblock++;
+         s->block[s->nblock++] = (uint8_t)ch;
+         s->block[s->nblock++] = (uint8_t)ch;
          break;
       case 3:
-         s->block[s->nblock] = (uint8_t)ch; s->nblock++;
-         s->block[s->nblock] = (uint8_t)ch; s->nblock++;
-         s->block[s->nblock] = (uint8_t)ch; s->nblock++;
+         s->block[s->nblock++] = (uint8_t)ch;
+         s->block[s->nblock++] = (uint8_t)ch;
+         s->block[s->nblock++] = (uint8_t)ch;
          break;
       default:
          s->inUse[s->state_in_len-4] = true;
-         s->block[s->nblock] = (uint8_t)ch; s->nblock++;
-         s->block[s->nblock] = (uint8_t)ch; s->nblock++;
-         s->block[s->nblock] = (uint8_t)ch; s->nblock++;
-         s->block[s->nblock] = (uint8_t)ch; s->nblock++;
-         s->block[s->nblock] = ((uint8_t)(s->state_in_len-4));
-         s->nblock++;
+         s->block[s->nblock++] = (uint8_t)ch;
+         s->block[s->nblock++] = (uint8_t)ch;
+         s->block[s->nblock++] = (uint8_t)ch;
+         s->block[s->nblock++] = (uint8_t)ch;
+         s->block[s->nblock++] = ((uint8_t)(s->state_in_len-4));
          break;
    }
 }
@@ -259,8 +258,7 @@ void flush_RL ( EState* s )
       uint8_t ch = (uint8_t)(zs->state_in_ch);    \
       BZ_UPDATE_CRC( zs->blockCRC, ch );          \
       zs->inUse[zs->state_in_ch] = true;          \
-      zs->block[zs->nblock] = (uint8_t)ch;        \
-      zs->nblock++;                               \
+      zs->block[zs->nblock++] = (uint8_t)ch;      \
       zs->state_in_ch = zchh;                     \
    }                                              \
    else                                           \
@@ -1092,7 +1090,7 @@ BZFILE* BZ_API(BZ2_bzReadOpen)
    bzf->handle = f;
 
    while (nUnused > 0) {
-      bzf->buf[bzf->bufN] = *((uint8_t*)(unused)); bzf->bufN++;
+      bzf->buf[bzf->bufN++] = *((uint8_t*)(unused));
       unused = ((void*)( 1 + ((uint8_t*)(unused))  ));
       nUnused--;
    }
