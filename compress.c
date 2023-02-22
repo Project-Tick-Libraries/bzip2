@@ -284,9 +284,7 @@ void sendMTFValues ( EState* s )
                       (100.0 * (float)aFreq) / (float)(s->nMTF) );
 
          for (v = 0; v < alphaSize; v++)
-            if (v >= gs && v <= ge)
-               s->len[nPart-1][v] = BZ_LESSER_ICOST; else
-               s->len[nPart-1][v] = BZ_GREATER_ICOST;
+            s->len[nPart-1][v] = (uint8_t)((v >= gs && v <= ge) ? BZ_LESSER_ICOST : BZ_GREATER_ICOST);
 
          nPart--;
          gs = ge+1;
@@ -458,8 +456,9 @@ void sendMTFValues ( EState* s )
       minLen = 32;
       maxLen = 0;
       for (i = 0; i < alphaSize; i++) {
-         if (s->len[t][i] > maxLen) maxLen = s->len[t][i];
-         if (s->len[t][i] < minLen) minLen = s->len[t][i];
+         int32_t target = (int32_t)s->len[t][i];
+         if (target > maxLen) maxLen = target;
+         if (target < minLen) minLen = target;
       }
       AssertH ( !(maxLen > 17 /*20*/ ), 3004 );
       AssertH ( !(minLen < 1),  3005 );

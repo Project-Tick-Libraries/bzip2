@@ -308,7 +308,7 @@ int32_t BZ2_decompress ( DState* s )
          for (i = 0; i < nSelectors; i++) {
             v = s->selectorMtf[i];
             tmp = pos[v];
-            for (; v > 0U; v--) pos[v] = pos[v-1];
+            memmove(&pos[1], pos, v);
             pos[0] = tmp;
             s->selector[i] = tmp;
          }
@@ -334,8 +334,9 @@ int32_t BZ2_decompress ( DState* s )
          minLen = 32;
          maxLen = 0;
          for (i = 0; i < alphaSize; i++) {
-            if (s->len[t][i] > maxLen) maxLen = s->len[t][i];
-            if (s->len[t][i] < minLen) minLen = s->len[t][i];
+            int32_t target = (int32_t)s->len[t][i];
+            if (target > maxLen) maxLen = target;
+            if (target < minLen) minLen = target;
          }
          BZ2_hbCreateDecodeTables (
             &(s->limit[t][0]),
@@ -419,43 +420,32 @@ int32_t BZ2_decompress ( DState* s )
 
             /*-- uc = MTF ( nextSym-1 ) --*/
             {
-               int32_t  ii, jj, kk, pp, lno, off;
-               uint32_t nn;
-               nn = (uint32_t)(nextSym - 1);
+               int32_t ii, jj, kk, pp, lno, off;
+               int32_t nn = nextSym - 1;
 
                if (nn < MTFL_SIZE) {
                   /* avoid general-case expense */
                   pp = s->mtfbase[0];
                   uc = s->mtfa[pp+nn];
-                  for (; nn > 3U; nn -= 4U) {
-                     int32_t z = pp + (int32_t)nn;
-                     s->mtfa[(z)  ] = s->mtfa[(z)-1];
-                     s->mtfa[(z)-1] = s->mtfa[(z)-2];
-                     s->mtfa[(z)-2] = s->mtfa[(z)-3];
-                     s->mtfa[(z)-3] = s->mtfa[(z)-4];
-                  }
-                  for (; nn > 0U; nn--) s->mtfa[(pp+nn)] = s->mtfa[(pp+nn)-1];
+                  memmove(&(s->mtfa[pp+1]), &(s->mtfa[pp]), (size_t)nn);
                   s->mtfa[pp] = uc;
                } else {
                   /* general case */
                   lno = nn / MTFL_SIZE;
                   off = nn % MTFL_SIZE;
-                  pp = s->mtfbase[lno] + off;
-                  uc = s->mtfa[pp];
-                  for (; pp > s->mtfbase[lno]; pp--) s->mtfa[pp] = s->mtfa[pp-1];
+                  pp  = s->mtfbase[lno];
+                  uc  = s->mtfa[pp+off];
+                  memmove(&(s->mtfa[pp+1]), &(s->mtfa[pp]), (size_t)off);
                   s->mtfbase[lno]++;
                   for (; lno > 0; lno--) {
-                     s->mtfbase[lno]--;
-                     s->mtfa[s->mtfbase[lno]] = s->mtfa[s->mtfbase[lno-1] + MTFL_SIZE - 1];
+                     s->mtfa[--(s->mtfbase[lno])] = s->mtfa[s->mtfbase[lno-1] + MTFL_SIZE - 1];
                   }
-                  s->mtfbase[0]--;
-                  s->mtfa[s->mtfbase[0]] = uc;
+                  s->mtfa[--(s->mtfbase[0])] = uc;
                   if (s->mtfbase[0] == 0) {
                      kk = MTFA_SIZE-1;
                      for (ii = 256 / MTFL_SIZE-1; ii >= 0; ii--) {
                         for (jj = MTFL_SIZE-1; jj >= 0; jj--) {
-                           s->mtfa[kk] = s->mtfa[s->mtfbase[ii] + jj];
-                           kk--;
+                           s->mtfa[kk--] = s->mtfa[s->mtfbase[ii] + jj];
                         }
                         s->mtfbase[ii] = kk + 1;
                      }
