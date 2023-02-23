@@ -355,7 +355,6 @@ bool uncompressStream ( FILE* zStream, FILE* stream )
    uint8_t   unused[BZ_MAX_UNUSED];
    int32_t   nUnused;
    void*     unusedTmpV;
-   uint8_t*  unusedTmp;
 
    nUnused = 0;
    streamNo = 0;
@@ -387,8 +386,7 @@ bool uncompressStream ( FILE* zStream, FILE* stream )
       BZ2_bzReadGetUnused ( &bzerr, bzf, &unusedTmpV, &nUnused );
       if (bzerr != BZ_OK) panic ( "decompress:bzReadGetUnused" );
 
-      unusedTmp = (uint8_t*)unusedTmpV;
-      memcpy (unused, unusedTmp, (size_t)nUnused);
+      memcpy (unused, unusedTmpV, (size_t)nUnused);
 
       BZ2_bzReadClose ( &bzerr, bzf );
       if (bzerr != BZ_OK) panic ( "decompress:bzReadGetUnused" );
@@ -476,7 +474,6 @@ bool testStream ( FILE* zStream )
    uint8_t   unused[BZ_MAX_UNUSED];
    int32_t   nUnused;
    void*     unusedTmpV;
-   uint8_t*  unusedTmp;
 
    nUnused = 0;
    streamNo = 0;
@@ -502,8 +499,7 @@ bool testStream ( FILE* zStream )
       BZ2_bzReadGetUnused ( &bzerr, bzf, &unusedTmpV, &nUnused );
       if (bzerr != BZ_OK) panic ( "test:bzReadGetUnused" );
 
-      unusedTmp = (uint8_t*)unusedTmpV;
-      memcpy (unused, unusedTmp, (size_t)nUnused);
+      memcpy (unused, unusedTmpV, (size_t)nUnused);
 
       BZ2_bzReadClose ( &bzerr, bzf );
       if (bzerr != BZ_OK) panic ( "test:bzReadGetUnused" );
