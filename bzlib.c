@@ -1089,10 +1089,9 @@ BZFILE* BZ_API(BZ2_bzReadOpen)
 
    bzf->handle = f;
 
-   while (nUnused > 0) {
+   for (; nUnused > 0; nUnused--) {
       bzf->buf[bzf->bufN++] = *((uint8_t*)(unused));
       unused = ((void*)( 1 + ((uint8_t*)(unused))  ));
-      nUnused--;
    }
 
    ret = BZ2_bzDecompressInit ( &(bzf->strm), verbosity, small );

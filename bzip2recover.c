@@ -205,10 +205,9 @@ static void bsClose ( BitStream* bs )
    int32_t retVal;
 
    if ( bs->mode == 'w' ) {
-      while ( bs->buffLive < 8 ) {
-         bs->buffLive++;
+      for (; bs->buffLive < 8; bs->buffLive++) {
          bs->buffer <<= 1;
-      };
+      }
       retVal = putc ( bs->buffer, bs->handle );
       if (retVal == EOF) writeError();
       bytesOut++;

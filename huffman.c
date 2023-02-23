@@ -88,8 +88,8 @@ void BZ2_hbMakeCodeLengths ( uint8_t*       len,
       weight[0] = 0;
       parent[0] = -2;
 
+      memset(&parent[1], 0xFF, (size_t)alphaSize * sizeof(int32_t));
       for (i = 1; i <= alphaSize; i++) {
-         parent[i]     = -1;
          heap[++nHeap] = i;
          UPHEAP(nHeap);
       }
@@ -97,14 +97,12 @@ void BZ2_hbMakeCodeLengths ( uint8_t*       len,
       AssertH( nHeap < (BZ_MAX_ALPHA_SIZE+2), 2001 );
 
       while (nHeap > 1) {
-         n1 = heap[1]; heap[1] = heap[nHeap]; nHeap--; DOWNHEAP(1);
-         n2 = heap[1]; heap[1] = heap[nHeap]; nHeap--; DOWNHEAP(1);
-         nNodes++;
-         parent[n1] = parent[n2] = nNodes;
+         n1 = heap[1]; heap[1] = heap[nHeap--]; DOWNHEAP(1);
+         n2 = heap[1]; heap[1] = heap[nHeap--]; DOWNHEAP(1);
+         parent[n1] = parent[n2] = ++nNodes;
          weight[nNodes] = ADDWEIGHTS(weight[n1], weight[n2]);
          parent[nNodes] = -1;
-         nHeap++;
-         heap[nHeap] = nNodes;
+         heap[++nHeap] = nNodes;
          UPHEAP(nHeap);
       }
 
@@ -112,10 +110,9 @@ void BZ2_hbMakeCodeLengths ( uint8_t*       len,
 
       tooLong = false;
       for (i = 1; i <= alphaSize; i++) {
-         j = 0;
          k = i;
-         while (parent[k] >= 0) { k = parent[k]; j++; }
-         len[i-1] = j;
+         for (j = 0; parent[k] >= 0; j++) k = parent[k];
+         len[i-1] = (uint8_t)j;
          if (j > maxLen) tooLong = true;
       }
 
@@ -154,11 +151,9 @@ void BZ2_hbAssignCodes ( int32_t*       code,
                          int32_t        maxLen,
                          int32_t        alphaSize )
 {
-   int32_t n, vec, i;
-
-   vec = 0;
-   for (n = minLen; n <= maxLen; n++) {
-      for (i = 0; i < alphaSize; i++)
+   int32_t vec = 0;
+   for (int32_t n = minLen; n <= maxLen; n++) {
+      for (int32_t i = 0; i < alphaSize; i++)
          if (length[i] == n) { code[i] = vec++;};
       vec <<= 1;
    }

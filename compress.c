@@ -45,10 +45,9 @@ void BZ2_bsInitWrite ( EState* s )
 static
 void bsFinishWrite ( EState* s )
 {
-   while (s->bsLive > 0) {
+   for (; s->bsLive > 0; s->bsLive -= 8) {
       s->zbits[s->numZ++] = (uint8_t)(s->bsBuff >> 24);
       s->bsBuff <<= 8;
-      s->bsLive -= 8;
    }
 }
 
@@ -58,10 +57,9 @@ static
 inline
 void bsW ( EState* s, int32_t n, uint32_t v )
 {
-   while (s->bsLive >= 8) {
+   for (; s->bsLive >= 8; s->bsLive -= 8) {
       s->zbits[s->numZ++] = (uint8_t)(s->bsBuff >> 24);
       s->bsBuff <<= 8;
-      s->bsLive -= 8;
    }
    s->bsBuff |= (v << (32 - s->bsLive - n));
    s->bsLive += n;
@@ -258,18 +256,13 @@ void sendMTFValues ( EState* s )
 
    /*--- Generate an initial set of coding tables ---*/
    {
-      int32_t nPart, remF, tFreq, aFreq;
-
-      nPart = nGroups;
-      remF  = s->nMTF;
+      int32_t remF = s->nMTF;
       gs = 0;
-      while (nPart > 0) {
-         tFreq = remF / nPart;
+      for (int32_t nPart = nGroups; nPart > 0; nPart--) {
+         int32_t aFreq;
+         int32_t tFreq = remF / nPart;
          ge = gs-1;
-         aFreq = 0;
-         while (aFreq < tFreq && ge < alphaSize-1) {
-            aFreq += s->mtfFreq[++ge];
-         }
+         for (aFreq = 0; aFreq < tFreq && ge < alphaSize-1; aFreq += s->mtfFreq[++ge]);
 
          if (ge > gs
              && nPart != nGroups && nPart != 1
@@ -286,7 +279,6 @@ void sendMTFValues ( EState* s )
          for (v = 0; v < alphaSize; v++)
             s->len[nPart-1][v] = (uint8_t)((v >= gs && v <= ge) ? BZ_LESSER_ICOST : BZ_GREATER_ICOST);
 
-         nPart--;
          gs = ge+1;
          remF -= aFreq;
       }
@@ -503,11 +495,12 @@ void sendMTFValues ( EState* s )
    nBytes = s->numZ;
 
    for (t = 0; t < nGroups; t++) {
-      int32_t curr = s->len[t][0];
-      bsW ( s, 5, (uint32_t)curr );
+      uint32_t curr = (uint32_t)s->len[t][0];
+      bsW ( s, 5, curr );
       for (i = 0; i < alphaSize; i++) {
-         while (curr < s->len[t][i]) { bsW(s,2,2U); curr++; /* 10 */ };
-         while (curr > s->len[t][i]) { bsW(s,2,3U); curr--; /* 11 */ };
+         uint32_t target = (uint8_t)s->len[t][i];
+         for (; curr < target; curr++) bsW(s,2,2U); /* 10 */
+         for (; curr > target; curr--) bsW(s,2,3U); /* 11 */
          bsW ( s, 1, 0U );
       }
    }

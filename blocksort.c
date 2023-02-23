@@ -497,8 +497,7 @@ void mainSimpleSort ( uint32_t*       ptr,
    bigN = hi - lo + 1;
    if (bigN < 2) return;
 
-   hp = 0;
-   while (incs[hp] < bigN) hp++;
+   for (hp = 0; incs[hp] < bigN;  hp++) ;
    hp--;
 
    for (; hp >= 0; hp--) {
