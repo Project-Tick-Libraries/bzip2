@@ -134,9 +134,6 @@ void generateMTFValues ( EState* s )
       except for the last one, which is arranged in
       compressBlock().
    */
-   uint32_t* ptr   = s->ptr;
-   uint8_t*  block = s->block;
-   uint16_t* mtfv  = s->mtfv;
 
    makeMaps_e ( s );
    EOB = s->nInUse+1;
@@ -150,8 +147,8 @@ void generateMTFValues ( EState* s )
    for (i = 0; i < s->nblock; i++) {
       uint8_t ll_i;
       AssertD ( wr <= i, "generateMTFValues(1)" );
-      j = ptr[i]-1; if (j < 0) j += s->nblock;
-      ll_i = s->unseqToSeq[block[j]];
+      j = s->ptr[i]-1; if (j < 0) j += s->nblock;
+      ll_i = s->unseqToSeq[s->block[j]];
       AssertD ( ll_i < s->nInUse, "generateMTFValues(2a)" );
 
       if (yy[0] == ll_i) {
@@ -162,7 +159,7 @@ void generateMTFValues ( EState* s )
             zPend--;
             while (true) {
                int32_t run = (zPend & 1) ? BZ_RUNB : BZ_RUNA;
-               mtfv[wr++]  = (uint16_t)run;
+               s->mtfv[wr++]  = (uint16_t)run;
                s->mtfFreq[run]++;
                if (zPend < 2) break;
                zPend = (zPend - 2) >> 1;
@@ -186,7 +183,7 @@ void generateMTFValues ( EState* s )
             };
             yy[0] = rtmp;
             j = ryy_j - &(yy[0]);
-            mtfv[wr++] = j+1; s->mtfFreq[j+1]++;
+            s->mtfv[wr++] = j+1; s->mtfFreq[j+1]++;
          }
 
       }
@@ -195,8 +192,8 @@ void generateMTFValues ( EState* s )
    if (zPend > 0) {
       zPend--;
       while (true) {
-         int32_t run = (zPend & 1) ? BZ_RUNB : BZ_RUNA;
-         mtfv[wr++]  = (uint16_t)run;
+         int32_t run   = (zPend & 1) ? BZ_RUNB : BZ_RUNA;
+         s->mtfv[wr++] = (uint16_t)run;
          s->mtfFreq[run]++;
          if (zPend < 2) break;
          zPend = (zPend - 2) >> 1;
@@ -204,7 +201,7 @@ void generateMTFValues ( EState* s )
       zPend = 0;
    }
 
-   mtfv[wr++] = EOB; s->mtfFreq[EOB]++;
+   s->mtfv[wr++] = EOB; s->mtfFreq[EOB]++;
 
    s->nMTF = wr;
 }
@@ -234,8 +231,6 @@ void sendMTFValues ( EState* s )
 
    uint16_t cost[BZ_N_GROUPS];
    int32_t  fave[BZ_N_GROUPS];
-
-   uint16_t* mtfv = s->mtfv;
 
    if (s->verbosity >= 3)
       VPrintf( "      %d in block, %d after MTF & 1-2 coding, "
@@ -329,7 +324,7 @@ void sendMTFValues ( EState* s )
             cost01 = cost23 = cost45 = 0U;
 
 #           define BZ_ITER(nn)                \
-               icv = mtfv[gs+(nn)];           \
+               icv = s->mtfv[gs+(nn)];           \
                cost01 += s->len_pack[icv][0]; \
                cost23 += s->len_pack[icv][1]; \
                cost45 += s->len_pack[icv][2]; \
@@ -354,7 +349,7 @@ void sendMTFValues ( EState* s )
          } else {
             /*--- slow version which correctly handles all situations ---*/
             for (i = gs; i <= ge; i++) {
-               uint16_t icv = mtfv[i];
+               uint16_t icv = s->mtfv[i];
                for (t = 0; t < nGroups; t++) cost[t] += s->len[t][icv];
             }
          }
@@ -376,7 +371,7 @@ void sendMTFValues ( EState* s )
          if (nGroups == 6 && 50 == ge-gs+1) {
             /*--- fast track the common case ---*/
 
-#           define BZ_ITUR(nn) s->rfreq[bt][ mtfv[gs+(nn)] ]++
+#           define BZ_ITUR(nn) s->rfreq[bt][ s->mtfv[gs+(nn)] ]++
 
             BZ_ITUR(0);  BZ_ITUR(1);  BZ_ITUR(2);  BZ_ITUR(3);  BZ_ITUR(4);
             BZ_ITUR(5);  BZ_ITUR(6);  BZ_ITUR(7);  BZ_ITUR(8);  BZ_ITUR(9);
@@ -394,7 +389,7 @@ void sendMTFValues ( EState* s )
          } else {
             /*--- slow version which correctly handles all situations ---*/
             for (i = gs; i <= ge; i++)
-               s->rfreq[bt][ mtfv[i] ]++;
+               s->rfreq[bt][ s->mtfv[i] ]++;
          }
 
          gs = ge+1;
@@ -527,7 +522,7 @@ void sendMTFValues ( EState* s )
                = &(s->code[s->selector[selCtr]][0]);
 
 #           define BZ_ITAH(nn)                              \
-               mtfv_i = mtfv[gs+(nn)];                      \
+               mtfv_i = s->mtfv[gs+(nn)];                      \
                bsW ( s,                                     \
                      s_len_sel_selCtr[mtfv_i],              \
                      (uint32_t)s_code_sel_selCtr[mtfv_i] )
@@ -549,8 +544,8 @@ void sendMTFValues ( EState* s )
          /*--- slow version which correctly handles all situations ---*/
          for (i = gs; i <= ge; i++) {
             bsW ( s,
-                  s->len  [s->selector[selCtr]] [mtfv[i]],
-                  (uint32_t)(s->code[s->selector[selCtr]] [mtfv[i]]) );
+                  s->len  [s->selector[selCtr]] [s->mtfv[i]],
+                  (uint32_t)(s->code[s->selector[selCtr]] [s->mtfv[i]]) );
          }
       }
 
