@@ -493,7 +493,7 @@ void sendMTFValues ( EState* s )
       uint32_t curr = (uint32_t)s->len[t][0];
       bsW ( s, 5, curr );
       for (i = 0; i < alphaSize; i++) {
-         uint32_t target = (uint8_t)s->len[t][i];
+         uint32_t target = (uint32_t)s->len[t][i];
          for (; curr < target; curr++) bsW(s,2,2U); /* 10 */
          for (; curr > target; curr--) bsW(s,2,3U); /* 11 */
          bsW ( s, 1, 0U );
