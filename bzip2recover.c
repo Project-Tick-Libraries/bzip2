@@ -142,7 +142,7 @@ typedef
 /*---------------------------------------------*/
 static BitStream* bsOpenReadStream ( FILE* stream )
 {
-   BitStream *bs = calloc ( 1, sizeof(BitStream) );
+   BitStream *bs = calloc ( 1U, sizeof(BitStream) );
    if (bs == NULL) callocFail ( sizeof(BitStream) );
    bs->handle = stream;
    bs->mode = 'r';
@@ -153,7 +153,7 @@ static BitStream* bsOpenReadStream ( FILE* stream )
 /*---------------------------------------------*/
 static BitStream* bsOpenWriteStream ( FILE* stream )
 {
-   BitStream *bs = calloc ( 1, sizeof(BitStream) );
+   BitStream *bs = calloc ( 1U, sizeof(BitStream) );
    if (bs == NULL) callocFail ( sizeof(BitStream) );
    bs->handle = stream;
    bs->mode = 'w';

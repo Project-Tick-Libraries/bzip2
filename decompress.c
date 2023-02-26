@@ -479,7 +479,7 @@ int32_t BZ2_decompress ( DState* s )
       }
       /* Actually generate cftab. */
       s->cftab[0] = 0;
-      memcpy (&(s->cftab[1]), s->unzftab, 256U * sizeof(int32_t));
+      memcpy (&(s->cftab[1]), s->unzftab, sizeof(s->unzftab));
       for (i = 1; i <= 256; i++) s->cftab[i] += s->cftab[i-1];
       /* Check: cftab entries in range. */
       for (i = 0; i <= 256; i++) {

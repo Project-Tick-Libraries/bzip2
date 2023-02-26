@@ -1624,7 +1624,7 @@ void *myCalloc ( size_t n )
 {
    void* p;
 
-   p = calloc ( 1, n );
+   p = calloc ( 1U, n );
    if (p == NULL) outOfMemory ();
    return p;
 }

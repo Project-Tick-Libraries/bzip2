@@ -321,7 +321,7 @@ void sendMTFValues ( EState* s )
             cost01 = cost23 = cost45 = 0U;
 
 #           define BZ_ITER(nn)                \
-               icv = s->mtfv[gs+(nn)];           \
+               icv = s->mtfv[gs+(nn)];        \
                cost01 += s->len_pack[icv][0]; \
                cost23 += s->len_pack[icv][1]; \
                cost45 += s->len_pack[icv][2]; \
@@ -519,7 +519,7 @@ void sendMTFValues ( EState* s )
                = &(s->code[s->selector[selCtr]][0]);
 
 #           define BZ_ITAH(nn)                              \
-               mtfv_i = s->mtfv[gs+(nn)];                      \
+               mtfv_i = s->mtfv[gs+(nn)];                   \
                bsW ( s,                                     \
                      s_len_sel_selCtr[mtfv_i],              \
                      (uint32_t)s_code_sel_selCtr[mtfv_i] )

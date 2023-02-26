@@ -63,15 +63,14 @@ void fallbackSimpleSort ( uint32_t*       fmap,
 #define fswap(zz1, zz2) \
    { int32_t zztmp = zz1; zz1 = zz2; zz2 = zztmp; }
 
-#define fvswap(zzp1, zzp2, zzn)       \
-{                                     \
-   int32_t yyp1 = (zzp1);             \
-   int32_t yyp2 = (zzp2);             \
-   int32_t yyn  = (zzn);              \
-   for (; yyn > 0; yyn--) {           \
-      fswap(fmap[yyp1], fmap[yyp2]);  \
-      yyp1++; yyp2++;                 \
-   }                                  \
+#define fvswap(zzp1, zzp2, zzn)                 \
+{                                               \
+   int32_t yyp1 = (zzp1);                       \
+   int32_t yyp2 = (zzp2);                       \
+   for (int32_t yyn = (zzn); yyn > 0; yyn--) {  \
+      fswap(fmap[yyp1], fmap[yyp2]);            \
+      yyp1++; yyp2++;                           \
+   }                                            \
 }
 
 
@@ -229,7 +228,7 @@ void fallbackSort ( uint32_t* fmap,
    if (verb >= 4)
       VPrintf ( "        bucket sorting ...\n" );
    for (i = 0; i < nblock; i++) ftab[eclass8[i]]++;
-   memcpy (ftabCopy, ftab, 256U * sizeof(int32_t));
+   memcpy (ftabCopy, ftab, sizeof(ftabCopy));
    for (i = 1; i < 257;    i++) ftab[i] += ftab[i-1];
 
    for (i = 0; i < nblock; i++) {
@@ -563,15 +562,14 @@ void mainSimpleSort ( uint32_t*       ptr,
 #define mswap(zz1, zz2) \
    { int32_t zztmp = zz1; zz1 = zz2; zz2 = zztmp; }
 
-#define mvswap(zzp1, zzp2, zzn)     \
-{                                   \
-   int32_t yyp1 = (zzp1);           \
-   int32_t yyp2 = (zzp2);           \
-   int32_t yyn  = (zzn);            \
-   for (; yyn > 0; yyn--) {         \
-      mswap(ptr[yyp1], ptr[yyp2]);  \
-      yyp1++; yyp2++;               \
-   }                                \
+#define mvswap(zzp1, zzp2, zzn)                 \
+{                                               \
+   int32_t yyp1 = (zzp1);                       \
+   int32_t yyp2 = (zzp2);                       \
+   for (int32_t yyn = (zzn); yyn > 0; yyn--) {  \
+      mswap(ptr[yyp1], ptr[yyp2]);              \
+      yyp1++; yyp2++;                           \
+   }                                            \
 }
 
 static
