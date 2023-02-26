@@ -68,9 +68,9 @@ void fallbackSimpleSort ( uint32_t*       fmap,
    int32_t yyp1 = (zzp1);             \
    int32_t yyp2 = (zzp2);             \
    int32_t yyn  = (zzn);              \
-   while (yyn > 0) {                  \
+   for (; yyn > 0; yyn--) {           \
       fswap(fmap[yyp1], fmap[yyp2]);  \
-      yyp1++; yyp2++; yyn--;          \
+      yyp1++; yyp2++;                 \
    }                                  \
 }
 
@@ -563,15 +563,15 @@ void mainSimpleSort ( uint32_t*       ptr,
 #define mswap(zz1, zz2) \
    { int32_t zztmp = zz1; zz1 = zz2; zz2 = zztmp; }
 
-#define mvswap(zzp1, zzp2, zzn)       \
-{                                     \
-   int32_t yyp1 = (zzp1);             \
-   int32_t yyp2 = (zzp2);             \
-   int32_t yyn  = (zzn);              \
-   while (yyn > 0) {                  \
-      mswap(ptr[yyp1], ptr[yyp2]);    \
-      yyp1++; yyp2++; yyn--;          \
-   }                                  \
+#define mvswap(zzp1, zzp2, zzn)     \
+{                                   \
+   int32_t yyp1 = (zzp1);           \
+   int32_t yyp2 = (zzp2);           \
+   int32_t yyn  = (zzn);            \
+   for (; yyn > 0; yyn--) {         \
+      mswap(ptr[yyp1], ptr[yyp2]);  \
+      yyp1++; yyp2++;               \
+   }                                \
 }
 
 static

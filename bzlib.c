@@ -119,7 +119,7 @@ void prepare_new_block ( EState* s )
    s->numZ = 0;
    s->state_out_pos = 0;
    BZ_INITIALISE_CRC ( s->blockCRC );
-   memset (s->inUse, 0, 256 * sizeof(bool));
+   memset (s->inUse, 0, sizeof(s->inUse));
    s->blockNo++;
 }
 

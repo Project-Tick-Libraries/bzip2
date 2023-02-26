@@ -264,7 +264,7 @@ int32_t BZ2_decompress ( DState* s )
          s->inUse16[i] = (uc == 1U);
       }
 
-      memset (s->inUse, 0, 256U * sizeof(bool));
+      memset (s->inUse, 0, sizeof(s->inUse));
 
       for (i = 0; i < 16; i++)
          if (s->inUse16[i]) {
@@ -355,7 +355,7 @@ int32_t BZ2_decompress ( DState* s )
       groupNo  = -1;
       groupPos = 0;
 
-      memset (s->unzftab, 0, 256U * sizeof(int32_t));
+      memset (s->unzftab, 0, sizeof(s->unzftab));
 
       /*-- MTF init --*/
       {

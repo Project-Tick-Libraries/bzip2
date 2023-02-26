@@ -830,7 +830,7 @@ void pad ( const char* s )
 {
    int32_t length = (int32_t)strlen(s);
    if ( length >= longestFileName ) return;
-   for (int i = 1; i <= longestFileName - length; i++)
+   for (int32_t i = 1; i <= longestFileName - length; i++)
       fprintf ( stderr, " " );
 }
 

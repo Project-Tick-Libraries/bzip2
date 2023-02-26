@@ -238,8 +238,7 @@ void sendMTFValues ( EState* s )
                 s->nblock, s->nMTF, s->nInUse );
 
    alphaSize = s->nInUse + 2;
-   for (t = 0; t < BZ_N_GROUPS; t++)
-      memset (s->len[t], BZ_GREATER_ICOST, (size_t)alphaSize);
+   memset(s->len, BZ_GREATER_ICOST, sizeof(s->len));
 
    /*--- Decide how many coding tables to use ---*/
    AssertH ( s->nMTF > 0, 3001 );
@@ -284,10 +283,8 @@ void sendMTFValues ( EState* s )
    ---*/
    for (iter = 0; iter < BZ_N_ITERS; iter++) {
 
-      memset (fave, 0, (size_t)nGroups * sizeof(int32_t));
-
-      for (t = 0; t < nGroups; t++)
-         memset (s->rfreq[t], 0, (size_t)alphaSize * sizeof(int32_t));
+      memset (fave, 0, sizeof(fave));
+      memset (s->rfreq, 0, sizeof(s->rfreq));
 
       /*---
         Set up an auxiliary length table which is used to fast-track
@@ -315,7 +312,7 @@ void sendMTFValues ( EState* s )
             Calculate the cost of this group as coded
             by each of the coding tables.
          --*/
-         memset (cost, 0, (size_t)nGroups * sizeof(uint16_t));
+         memset (cost, 0, sizeof(cost));
 
          if (nGroups == 6 && 50 == ge-gs+1) {
             /*--- fast track the common case ---*/

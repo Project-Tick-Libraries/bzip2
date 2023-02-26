@@ -22,14 +22,6 @@
 #include "bzlib_private.h"
 
 /*---------------------------------------------------*/
-#define WEIGHTOF(zz0)  ((zz0) & 0xffffff00)
-#define DEPTHOF(zz1)   ((zz1) & 0x000000ff)
-#define MYMAX(zz2,zz3) ((zz2) > (zz3) ? (zz2) : (zz3))
-
-#define ADDWEIGHTS(zw1,zw2)                           \
-   (WEIGHTOF(zw1)+WEIGHTOF(zw2)) |                    \
-   (1 + MYMAX(DEPTHOF(zw1),DEPTHOF(zw2)))
-
 #define UPHEAP(z)                                     \
 {                                                     \
    int32_t zz, tmp;                                   \
@@ -56,6 +48,15 @@
       zz = yy;                                        \
    }                                                  \
    heap[zz] = tmp;                                    \
+}
+
+
+/*---------------------------------------------------*/
+static
+int32_t addWeights(int32_t a, int32_t b) {
+   int32_t da = a & 0x000000ff;
+   int32_t db = b & 0x000000ff;
+   return ((a & 0xffffff00) + (b & 0xffffff00)) | (1 + ((da > db) ? da : db));
 }
 
 
@@ -100,7 +101,7 @@ void BZ2_hbMakeCodeLengths ( uint8_t*       len,
          n1 = heap[1]; heap[1] = heap[nHeap--]; DOWNHEAP(1);
          n2 = heap[1]; heap[1] = heap[nHeap--]; DOWNHEAP(1);
          parent[n1] = parent[n2] = ++nNodes;
-         weight[nNodes] = ADDWEIGHTS(weight[n1], weight[n2]);
+         weight[nNodes] = addWeights(weight[n1], weight[n2]);
          parent[nNodes] = -1;
          heap[++nHeap] = nNodes;
          UPHEAP(nHeap);
