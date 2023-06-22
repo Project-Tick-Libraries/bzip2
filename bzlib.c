@@ -103,6 +103,7 @@ int bz_config_ok ( void )
 static
 void* default_bzalloc ( void* opaque, Int32 items, Int32 size )
 {
+   (void)opaque; /* unused */
    void* v = malloc ( items * size );
    return v;
 }
@@ -110,6 +111,7 @@ void* default_bzalloc ( void* opaque, Int32 items, Int32 size )
 static
 void default_bzfree ( void* opaque, void* addr )
 {
+   (void)opaque; /* unused */
    if (addr != NULL) free ( addr );
 }
 
@@ -1513,6 +1515,7 @@ int BZ_API(BZ2_bzwrite) (BZFILE* b, void* buf, int len )
 /*---------------------------------------------------*/
 int BZ_API(BZ2_bzflush) (BZFILE *b)
 {
+   (void)b; /* unused */
    /* do nothing now... */
    return 0;
 }
