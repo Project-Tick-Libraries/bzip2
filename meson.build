@@ -126,6 +126,11 @@ else
   )
 endif
 
+libbzip2_dep = declare_dependency(
+  link_with: libbzip2,
+  include_directories: '.'
+)
+
 bzip2 = executable(
   'bzip2',
   ['bzip2.c'],
