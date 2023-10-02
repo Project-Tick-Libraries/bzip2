@@ -304,14 +304,20 @@ if(ENABLE_SHARED_LIB)
         PRIVATE   ${BZ2_SOURCES}
                   ${CMAKE_CURRENT_SOURCE_DIR}/libbz2.def
         PUBLIC    ${CMAKE_CURRENT_SOURCE_DIR}/bzlib_private.h
-        INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h)
+        INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h
+    )
 
     # Always use '-fPIC'/'-fPIE' option for shared libraries.
     set_property(TARGET bz2 PROPERTY POSITION_INDEPENDENT_CODE ON)
 
     set_target_properties(bz2 PROPERTIES
         COMPILE_FLAGS "${WARNCFLAGS}"
-        VERSION ${LT_VERSION} SOVERSION ${LT_SOVERSION})
+        VERSION ${LT_VERSION} SOVERSION ${LT_SOVERSION}
+
+        # On DLL platforms to avoid conflicts with static library, override the default name as per
+        # https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#archive-output-artifacts
+        ARCHIVE_OUTPUT_NAME bz2.dll
+    )
     install(TARGETS bz2 DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(FILES bzlib.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
@@ -343,7 +349,8 @@ if(ENABLE_STATIC_LIB)
     target_sources(bz2_static
         PRIVATE     ${BZ2_SOURCES}
         PUBLIC      ${CMAKE_CURRENT_SOURCE_DIR}/bzlib_private.h
-        INTERFACE   ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h)
+        INTERFACE   ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h
+    )
 
     # Use '-fPIC'/'-fPIE' option for static libraries by default.
     # You may build with ENABLE_STATIC_LIB_IS_PIC=OFF to disable PIC for the static library.
@@ -355,7 +362,8 @@ if(ENABLE_STATIC_LIB)
         COMPILE_FLAGS       "${WARNCFLAGS}"
         VERSION             ${LT_VERSION}
         SOVERSION           ${LT_SOVERSION}
-        ARCHIVE_OUTPUT_NAME bz2)
+        ARCHIVE_OUTPUT_NAME bz2
+    )
     target_compile_definitions(bz2_static PUBLIC BZ2_STATICLIB)
     install(TARGETS bz2_static DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(FILES bzlib.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
