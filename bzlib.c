@@ -282,7 +282,7 @@ static
 bool copy_input_until_stop ( EState* s )
 {
    bool     progress_in = false;
-   uint64_t total_in = U32_TO_U64(s->strm->total_in_hi32, s->strm->total_in_lo32);
+   uint64_t total_in    = U32_TO_U64(s->strm->total_in_hi32, s->strm->total_in_lo32);
 
    if (s->mode == BZ_M_RUNNING) {
 
@@ -328,7 +328,7 @@ static
 bool copy_output_until_stop ( EState* s )
 {
    bool     progress_out = false;
-   uint64_t total_out = U32_TO_U64(s->strm->total_out_hi32, s->strm->total_out_lo32);
+   uint64_t total_out    = U32_TO_U64(s->strm->total_out_hi32, s->strm->total_out_lo32);
 
    while (true) {
 

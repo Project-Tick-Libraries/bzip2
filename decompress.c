@@ -105,7 +105,7 @@ int32_t BZ2_decompress ( DState* s )
    uint8_t    uc;
    int32_t    retVal;
    int32_t    minLen, maxLen;
-   bz_stream* strm = s->strm;
+   bz_stream* strm     = s->strm;
    uint64_t   total_in = U32_TO_U64(s->strm->total_in_hi32, s->strm->total_in_lo32);
 
    /* stuff that needs to be saved/restored */
