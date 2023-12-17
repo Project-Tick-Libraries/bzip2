@@ -281,7 +281,7 @@ void flush_RL ( EState* s )
 static
 bool copy_input_until_stop ( EState* s )
 {
-   bool progress_in = false;
+   bool     progress_in = false;
    uint64_t total_in = U32_TO_U64(s->strm->total_in_hi32, s->strm->total_in_lo32);
 
    if (s->mode == BZ_M_RUNNING) {
@@ -327,7 +327,7 @@ bool copy_input_until_stop ( EState* s )
 static
 bool copy_output_until_stop ( EState* s )
 {
-   bool progress_out = false;
+   bool     progress_out = false;
    uint64_t total_out = U32_TO_U64(s->strm->total_out_hi32, s->strm->total_out_lo32);
 
    while (true) {
@@ -530,7 +530,7 @@ int BZ_API(BZ2_bzDecompressInit)
 static
 bool unRLE_obuf_to_output_FAST ( DState* s )
 {
-   uint8_t k1;
+   uint8_t  k1;
    uint64_t total_out = U32_TO_U64(s->strm->total_out_hi32, s->strm->total_out_lo32);
 
    if (s->blockRandomised) {
@@ -702,7 +702,7 @@ inline int32_t BZ2_indexIntoF ( int32_t indx, const int32_t *cftab )
 static
 bool unRLE_obuf_to_output_SMALL ( DState* s )
 {
-   uint8_t k1;
+   uint8_t  k1;
    uint64_t total_out = U32_TO_U64(s->strm->total_out_hi32, s->strm->total_out_lo32);
 
    if (s->blockRandomised) {
