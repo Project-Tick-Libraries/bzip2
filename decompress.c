@@ -207,11 +207,11 @@ int32_t BZ2_decompress ( DState* s )
       s->blockSize100k -= BZ_HDR_0;
 
       if (s->smallDecompress) {
-         s->ll16 = BZALLOC( (size_t)(s->blockSize100k * 100000),          sizeof(uint16_t) );
-         s->ll4  = BZALLOC( (size_t)(1 + s->blockSize100k * 100000) >> 1, sizeof(uint8_t) );
+         s->ll16 = BZALLOC( s->blockSize100k * 100000,            sizeof(uint16_t) );
+         s->ll4  = BZALLOC( (1 + s->blockSize100k * 100000) >> 1, sizeof(uint8_t) );
          if (s->ll16 == NULL || s->ll4 == NULL) RETURN(BZ_MEM_ERROR);
       } else {
-         s->tt   = BZALLOC( (size_t)(s->blockSize100k * 100000),          sizeof(int32_t) );
+         s->tt   = BZALLOC( s->blockSize100k * 100000,            sizeof(int32_t) );
          if (s->tt == NULL) RETURN(BZ_MEM_ERROR);
       }
 
