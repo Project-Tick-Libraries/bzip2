@@ -98,9 +98,9 @@ bool bz_config_ok ( void )
 
 /*---------------------------------------------------*/
 static
-void* default_bzalloc ( void* opaque, size_t items, size_t size )
+void* default_bzalloc ( void* opaque, int items, int size )
 {
-   return calloc ( items, size );
+   return calloc ( (size_t)items, (size_t)size );
 }
 
 static
@@ -181,23 +181,25 @@ int BZ_API(BZ2_bzCompressInit)
       return BZ_MEM_ERROR;
    }
 
-   s->blockNo       = 0;
-   s->state         = BZ_S_INPUT;
-   s->mode          = BZ_M_RUNNING;
-   s->combinedCRC   = 0U;
-   s->blockSize100k = blockSize100k;
-   s->nblockMAX     = 100000 * blockSize100k - 19;
-   s->verbosity     = verbosity;
-   s->workFactor    = workFactor;
+   s->blockNo           = 0;
+   s->state             = BZ_S_INPUT;
+   s->mode              = BZ_M_RUNNING;
+   s->combinedCRC       = 0U;
+   s->blockSize100k     = blockSize100k;
+   s->nblockMAX         = 100000 * blockSize100k - 19;
+   s->verbosity         = verbosity;
+   s->workFactor        = workFactor;
 
-   s->block         = (uint8_t*)(s->arr2);
-   s->mtfv          = (uint16_t*)(s->arr1);
-   s->zbits         = NULL;
-   s->ptr           = (uint32_t*)(s->arr1);
+   s->block             = (uint8_t*)(s->arr2);
+   s->mtfv              = (uint16_t*)(s->arr1);
+   s->zbits             = NULL;
+   s->ptr               = (uint32_t*)(s->arr1);
 
-   strm->state      = s;
-   strm->total_in   = UINT64_C(0);
-   strm->total_out  = UINT64_C(0);
+   strm->state          = s;
+   strm->total_in_lo32  = 0U;
+   strm->total_in_hi32  = 0U;
+   strm->total_out_lo32 = 0U;
+   strm->total_out_hi32 = 0U;
    init_RL ( s );
    prepare_new_block ( s );
    return BZ_OK;
@@ -280,6 +282,7 @@ static
 bool copy_input_until_stop ( EState* s )
 {
    bool progress_in = false;
+   uint64_t total_in = U32_TO_U64(s->strm->total_in_hi32, s->strm->total_in_lo32);
 
    if (s->mode == BZ_M_RUNNING) {
 
@@ -293,7 +296,7 @@ bool copy_input_until_stop ( EState* s )
          ADD_CHAR_TO_BLOCK ( s, (uint32_t)(*((uint8_t*)(s->strm->next_in))) );
          s->strm->next_in++;
          s->strm->avail_in--;
-         s->strm->total_in++;
+         total_in++;
       }
 
    } else {
@@ -310,10 +313,12 @@ bool copy_input_until_stop ( EState* s )
          ADD_CHAR_TO_BLOCK ( s, (uint32_t)(*((uint8_t*)(s->strm->next_in))) );
          s->strm->next_in++;
          s->strm->avail_in--;
-         s->strm->total_in++;
+         total_in++;
          s->avail_in_expect--;
       }
    }
+
+   U64_TO_U32(total_in, s->strm->total_in_hi32, s->strm->total_in_lo32);
    return progress_in;
 }
 
@@ -323,6 +328,7 @@ static
 bool copy_output_until_stop ( EState* s )
 {
    bool progress_out = false;
+   uint64_t total_out = U32_TO_U64(s->strm->total_out_hi32, s->strm->total_out_lo32);
 
    while (true) {
 
@@ -337,9 +343,10 @@ bool copy_output_until_stop ( EState* s )
       s->state_out_pos++;
       s->strm->avail_out--;
       s->strm->next_out++;
-      s->strm->total_out++;
+      total_out++;
    }
 
+   U64_TO_U32(total_out, s->strm->total_out_hi32, s->strm->total_out_lo32);
    return progress_out;
 }
 
@@ -501,8 +508,10 @@ int BZ_API(BZ2_bzDecompressInit)
    s->bsLive                = 0;
    s->bsBuff                = 0U;
    s->calculatedCombinedCRC = 0U;
-   strm->total_in           = UINT64_C(0);
-   strm->total_out          = UINT64_C(0);
+   strm->total_in_lo32      = 0U;
+   strm->total_in_hi32      = 0U;
+   strm->total_out_lo32     = 0U;
+   strm->total_out_hi32     = 0U;
    s->smallDecompress       = (bool)small;
    s->ll4                   = NULL;
    s->ll16                  = NULL;
@@ -522,6 +531,7 @@ static
 bool unRLE_obuf_to_output_FAST ( DState* s )
 {
    uint8_t k1;
+   uint64_t total_out = U32_TO_U64(s->strm->total_out_hi32, s->strm->total_out_lo32);
 
    if (s->blockRandomised) {
 
@@ -535,15 +545,17 @@ bool unRLE_obuf_to_output_FAST ( DState* s )
             s->state_out_len--;
             s->strm->next_out++;
             s->strm->avail_out--;
-            s->strm->total_out++;
+            total_out++;
          }
 
          /* can a new run be started? */
          if (s->nblock_used == s->save_nblock+1) return false;
 
          /* Only caused by corrupt data stream? */
-         if (s->nblock_used > s->save_nblock+1)
+         if (s->nblock_used > s->save_nblock+1) {
+            U64_TO_U32(total_out, s->strm->total_out_hi32, s->strm->total_out_lo32);
             return true;
+         }
 
          s->state_out_len = 1;
          s->state_out_ch = s->k0;
@@ -614,8 +626,10 @@ bool unRLE_obuf_to_output_FAST ( DState* s )
             }
          }
          /* Only caused by corrupt data stream? */
-         if (c_nblock_used > s_save_nblockPP)
+         if (c_nblock_used > s_save_nblockPP) {
+            U64_TO_U32(total_out, s->strm->total_out_hi32, s->strm->total_out_lo32);
             return true;
+         }
 
          /* can a new run be started? */
          if (c_nblock_used == s_save_nblockPP) {
@@ -645,7 +659,7 @@ bool unRLE_obuf_to_output_FAST ( DState* s )
       }
 
       return_notr:
-      s->strm->total_out += (uint64_t)(avail_out_INIT - cs_avail_out);
+      total_out += (uint64_t)(avail_out_INIT - cs_avail_out);
 
       /* save */
       s->calculatedBlockCRC = c_calculatedBlockCRC;
@@ -659,6 +673,8 @@ bool unRLE_obuf_to_output_FAST ( DState* s )
       s->strm->avail_out    = cs_avail_out;
       /* end save */
    }
+
+   U64_TO_U32(total_out, s->strm->total_out_hi32, s->strm->total_out_lo32);
    return false;
 }
 
@@ -687,6 +703,7 @@ static
 bool unRLE_obuf_to_output_SMALL ( DState* s )
 {
    uint8_t k1;
+   uint64_t total_out = U32_TO_U64(s->strm->total_out_hi32, s->strm->total_out_lo32);
 
    if (s->blockRandomised) {
 
@@ -700,15 +717,17 @@ bool unRLE_obuf_to_output_SMALL ( DState* s )
             s->state_out_len--;
             s->strm->next_out++;
             s->strm->avail_out--;
-            s->strm->total_out++;
+            total_out++;
          }
 
          /* can a new run be started? */
          if (s->nblock_used == s->save_nblock+1) return false;
 
          /* Only caused by corrupt data stream? */
-         if (s->nblock_used > s->save_nblock+1)
+         if (s->nblock_used > s->save_nblock+1) {
+            U64_TO_U32(total_out, s->strm->total_out_hi32, s->strm->total_out_lo32);
             return true;
+         }
 
          s->state_out_len = 1;
          s->state_out_ch = s->k0;
@@ -748,15 +767,17 @@ bool unRLE_obuf_to_output_SMALL ( DState* s )
             s->state_out_len--;
             s->strm->next_out++;
             s->strm->avail_out--;
-            s->strm->total_out++;
+            total_out++;
          }
 
          /* can a new run be started? */
          if (s->nblock_used == s->save_nblock+1) return false;
 
          /* Only caused by corrupt data stream? */
-         if (s->nblock_used > s->save_nblock+1)
+         if (s->nblock_used > s->save_nblock+1) {
+            U64_TO_U32(total_out, s->strm->total_out_hi32, s->strm->total_out_lo32);
             return true;
+         }
 
          s->state_out_len = 1;
          s->state_out_ch = s->k0;
@@ -778,8 +799,9 @@ bool unRLE_obuf_to_output_SMALL ( DState* s )
          s->state_out_len = (int32_t)(k1 + 4U);
          BZ_GET_SMALL(s->k0); s->nblock_used++;
       }
-
    }
+
+   U64_TO_U32(total_out, s->strm->total_out_hi32, s->strm->total_out_lo32);
 }
 
 
@@ -1043,13 +1065,13 @@ void BZ_API(BZ2_bzWriteClose64)
    }
 
    if (nbytes_in_lo32 != NULL)
-      *nbytes_in_lo32 = (uint32_t)(bzf->strm.total_in & UINT64_C(0xFFFFFFFF));
+      *nbytes_in_lo32 = bzf->strm.total_in_lo32;
    if (nbytes_in_hi32 != NULL)
-      *nbytes_in_hi32 = (uint32_t)(bzf->strm.total_in >> 32);
+      *nbytes_in_hi32 = bzf->strm.total_in_hi32;
    if (nbytes_out_lo32 != NULL)
-      *nbytes_out_lo32 = (uint32_t)(bzf->strm.total_out & UINT64_C(0xFFFFFFFF));
+      *nbytes_out_lo32 = bzf->strm.total_out_lo32;
    if (nbytes_out_hi32 != NULL)
-      *nbytes_out_hi32 = (uint32_t)(bzf->strm.total_out >> 32);
+      *nbytes_out_hi32 = bzf->strm.total_out_hi32;
 
    BZ_SETERR(BZ_OK);
    BZ2_bzCompressEnd ( &(bzf->strm) );

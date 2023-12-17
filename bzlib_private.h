@@ -448,6 +448,17 @@ typedef
     s->tPos = GET_LL(s->tPos);
 
 
+/*-- Macros for data conversion --*/
+
+#define U32_TO_U64(h, l) \
+    ((uint64_t)(h) << 32) | (uint64_t)(l)
+
+#define U64_TO_U32(b, h, l)              \
+   { h = (uint32_t)((b) >> 32);          \
+     l = (uint32_t)((b) & 0xFFFFFFFFU);  \
+   }
+
+
 /*-- externs for decompression. --*/
 
 extern int32_t

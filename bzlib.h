@@ -51,16 +51,18 @@ extern "C" {
 typedef
    struct {
       char *next_in;
-      uint32_t avail_in;
-      uint64_t total_in;
+      unsigned int avail_in;
+      unsigned int total_in_lo32;
+      unsigned int total_in_hi32;
 
       char *next_out;
-      uint32_t avail_out;
-      uint64_t total_out;
+      unsigned int avail_out;
+      unsigned int total_out_lo32;
+      unsigned int total_out_hi32;
 
       void *state;
 
-      void *(*bzalloc)(void *, size_t, size_t);
+      void *(*bzalloc)(void *, int, int);
       void (*bzfree)(void *, void *);
       void *opaque;
    }

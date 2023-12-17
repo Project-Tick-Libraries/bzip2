@@ -58,7 +58,7 @@ void makeMaps_d ( DState* s )
       s->bsLive += 8;                             \
       s->strm->next_in++;                         \
       s->strm->avail_in--;                        \
-      s->strm->total_in++;                        \
+      total_in++;                                 \
    }
 
 #define GET_UCHAR(lll,uuu)                        \
@@ -106,6 +106,7 @@ int32_t BZ2_decompress ( DState* s )
    int32_t    retVal;
    int32_t    minLen, maxLen;
    bz_stream* strm = s->strm;
+   uint64_t   total_in = U32_TO_U64(s->strm->total_in_hi32, s->strm->total_in_lo32);
 
    /* stuff that needs to be saved/restored */
    int32_t  i;
@@ -616,6 +617,7 @@ int32_t BZ2_decompress ( DState* s )
    s->save_gLimit      = gLimit;
    s->save_gBase       = gBase;
    s->save_gPerm       = gPerm;
+   U64_TO_U32(total_in, s->strm->total_in_hi32, s->strm->total_in_lo32);
 
    return retVal;
 }
