@@ -45,9 +45,6 @@ extern "C" {
 #define BZ_OUTBUFF_FULL      (-8)
 #define BZ_CONFIG_ERROR      (-9)
 
-#include <stdint.h>
-#include <sys/types.h>
-
 typedef
    struct {
       char *next_in;
