@@ -105,7 +105,6 @@ int32_t BZ2_decompress ( DState* s )
    uint8_t    uc;
    int32_t    retVal;
    int32_t    minLen, maxLen;
-   int32_t    base = 0;
    bz_stream* strm     = s->strm;
    uint64_t   total_in = U32_TO_U64(s->strm->total_in_hi32, s->strm->total_in_lo32);
 
@@ -270,10 +269,9 @@ int32_t BZ2_decompress ( DState* s )
 
       for (i = 0; i < 16; i++)
          if (s->inUse16[i]) {
-            base = i << 4;
             for (j = 0; j < 16; j++) {
                GET_BIT(BZ_X_MAPPING_2, uc);
-               if (uc == UINT8_C(1)) s->inUse[base + j] = true;
+               if (uc == UINT8_C(1)) s->inUse[(i << 4) + j] = true;
             }
          }
       makeMaps_d ( s );
