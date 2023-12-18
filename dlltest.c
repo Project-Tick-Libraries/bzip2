@@ -8,6 +8,7 @@
 */
 
 #define BZ_IMPORT
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "bzlib.h"
@@ -135,7 +136,7 @@ int main(int argc,char *argv[])
             exit(1);
          }
          while((len=BZ2_bzread(BZ2fp_r,buff,0x1000))>0){
-            fwrite(buff,1U,(size_t)len,fp_w);
+            fwrite(buff,UINT32_C(1),(size_t)len,fp_w);
          }
          BZ2_bzclose(BZ2fp_r);
          if(fp_w != stdout) fclose(fp_w);
@@ -159,7 +160,7 @@ int main(int argc,char *argv[])
             printf("can't bz2openstream\n");
             exit(1);
          }
-         while((len=(int)fread(buff,1U,0x1000U,fp_r))>0){
+         while((len=(int)fread(buff,UINT32_C(1),0x1000U,fp_r))>0){
             BZ2_bzwrite(BZ2fp_w,buff,len);
          }
          BZ2_bzclose(BZ2fp_w);

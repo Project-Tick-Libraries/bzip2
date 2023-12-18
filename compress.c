@@ -37,7 +37,7 @@
 void BZ2_bsInitWrite ( EState* s )
 {
    s->bsLive = 0;
-   s->bsBuff = 0U;
+   s->bsBuff = UINT32_C(0);
 }
 
 
@@ -70,10 +70,10 @@ void bsW ( EState* s, int32_t n, uint32_t v )
 static
 void bsPutUInt32 ( EState* s, uint32_t u )
 {
-   bsW ( s, 8, (u >> 24) & 0xffU );
-   bsW ( s, 8, (u >> 16) & 0xffU );
-   bsW ( s, 8, (u >>  8) & 0xffU );
-   bsW ( s, 8,  u        & 0xffU );
+   bsW ( s, 8, (u >> 24) & UINT32_C(0xff) );
+   bsW ( s, 8, (u >> 16) & UINT32_C(0xff) );
+   bsW ( s, 8, (u >>  8) & UINT32_C(0xff) );
+   bsW ( s, 8,  u        & UINT32_C(0xff) );
 }
 
 
@@ -318,7 +318,7 @@ void sendMTFValues ( EState* s )
             /*--- fast track the common case ---*/
             register uint32_t cost01, cost23, cost45;
             register uint16_t icv;
-            cost01 = cost23 = cost45 = 0U;
+            cost01 = cost23 = cost45 = UINT32_C(0);
 
 #           define BZ_ITER(nn)                \
                icv = s->mtfv[gs+(nn)];        \
@@ -477,8 +477,8 @@ void sendMTFValues ( EState* s )
    bsW ( s, 3, (uint32_t)nGroups );
    bsW ( s, 15, (uint32_t)nSelectors );
    for (i = 0; i < nSelectors; i++) {
-      for (j = 0; j < s->selectorMtf[i]; j++) bsW(s,1,1U);
-      bsW(s,1,0U);
+      for (j = 0; j < s->selectorMtf[i]; j++) bsW(s,1,UINT32_C(1));
+      bsW(s,1,UINT32_C(0));
    }
    if (s->verbosity >= 3)
       VPrintf( "selectors %d, ", s->numZ-nBytes );
@@ -491,9 +491,9 @@ void sendMTFValues ( EState* s )
       bsW ( s, 5, curr );
       for (i = 0; i < alphaSize; i++) {
          uint32_t target = (uint32_t)s->len[t][i];
-         for (; curr < target; curr++) bsW(s,2,2U); /* 10 */
-         for (; curr > target; curr--) bsW(s,2,3U); /* 11 */
-         bsW ( s, 1, 0U );
+         for (; curr < target; curr++) bsW(s,2,UINT32_C(2)); /* 10 */
+         for (; curr > target; curr--) bsW(s,2,UINT32_C(3)); /* 11 */
+         bsW ( s, 1, UINT32_C(0) );
       }
    }
 
@@ -603,7 +603,7 @@ void BZ2_compressBlock ( EState* s, bool is_last_block )
          so as to maintain backwards compatibility with
          older versions of bzip2.
       --*/
-      bsW( s, 1, 0U);
+      bsW( s, 1, UINT32_C(0));
 
       bsW ( s, 24, (uint32_t)(s->origPtr) );
       generateMTFValues ( s );

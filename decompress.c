@@ -105,6 +105,7 @@ int32_t BZ2_decompress ( DState* s )
    uint8_t    uc;
    int32_t    retVal;
    int32_t    minLen, maxLen;
+   int32_t    base = 0;
    bz_stream* strm     = s->strm;
    uint64_t   total_in = U32_TO_U64(s->strm->total_in_hi32, s->strm->total_in_lo32);
 
@@ -217,24 +218,24 @@ int32_t BZ2_decompress ( DState* s )
 
       GET_UCHAR(BZ_X_BLKHDR_1, uc);
 
-      if (uc == 0x17U) goto endhdr_2;
-      if (uc != 0x31U) RETURN(BZ_DATA_ERROR);
+      if (uc == UINT8_C(0x17)) goto endhdr_2;
+      if (uc != UINT8_C(0x31)) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_BLKHDR_2, uc);
-      if (uc != 0x41U) RETURN(BZ_DATA_ERROR);
+      if (uc != UINT8_C(0x41)) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_BLKHDR_3, uc);
-      if (uc != 0x59U) RETURN(BZ_DATA_ERROR);
+      if (uc != UINT8_C(0x59)) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_BLKHDR_4, uc);
-      if (uc != 0x26U) RETURN(BZ_DATA_ERROR);
+      if (uc != UINT8_C(0x26)) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_BLKHDR_5, uc);
-      if (uc != 0x53U) RETURN(BZ_DATA_ERROR);
+      if (uc != UINT8_C(0x53)) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_BLKHDR_6, uc);
-      if (uc != 0x59U) RETURN(BZ_DATA_ERROR);
+      if (uc != UINT8_C(0x59)) RETURN(BZ_DATA_ERROR);
 
       s->currBlockNo++;
       if (s->verbosity >= 2)
          VPrintf ( "\n    [%d: huff+mtf ", s->currBlockNo );
 
-      s->storedBlockCRC = 0U;
+      s->storedBlockCRC = UINT32_C(0);
       GET_UCHAR(BZ_X_BCRC_1, uc);
       s->storedBlockCRC = (s->storedBlockCRC << 8) | ((uint32_t)uc);
       GET_UCHAR(BZ_X_BCRC_2, uc);
@@ -256,23 +257,23 @@ int32_t BZ2_decompress ( DState* s )
 
       if (s->origPtr < 0)
          RETURN(BZ_DATA_ERROR);
-      if (s->origPtr > 10 + 100000*s->blockSize100k)
+      if (s->origPtr > (10 + 100000*s->blockSize100k))
          RETURN(BZ_DATA_ERROR);
 
       /*--- Receive the mapping table ---*/
       for (i = 0; i < 16; i++) {
          GET_BIT(BZ_X_MAPPING_1, uc);
-         s->inUse16[i] = (uc == 1U);
+         s->inUse16[i] = (bool)(uc == UINT8_C(1));
       }
 
       memset (s->inUse, 0, sizeof(s->inUse));
 
       for (i = 0; i < 16; i++)
          if (s->inUse16[i]) {
-            int32_t base = i << 4;
+            base = i << 4;
             for (j = 0; j < 16; j++) {
                GET_BIT(BZ_X_MAPPING_2, uc);
-               if (uc == 1U) s->inUse[base + j] = true;
+               if (uc == UINT8_C(1)) s->inUse[base + j] = true;
             }
          }
       makeMaps_d ( s );
@@ -288,7 +289,7 @@ int32_t BZ2_decompress ( DState* s )
          j = 0;
          while (true) {
             GET_BIT(BZ_X_SELECTOR_3, uc);
-            if (uc == 0U) break;
+            if (uc == UINT8_C(0)) break;
             j++;
             if (j >= nGroups) RETURN(BZ_DATA_ERROR);
          }
@@ -322,9 +323,9 @@ int32_t BZ2_decompress ( DState* s )
             while (true) {
                if (curr < 1 || curr > 20) RETURN(BZ_DATA_ERROR);
                GET_BIT(BZ_X_CODING_2, uc);
-               if (uc == 0U) break;
+               if (uc == UINT8_C(0)) break;
                GET_BIT(BZ_X_CODING_3, uc);
-               if (uc == 0U) curr++; else curr--;
+               if (uc == UINT8_C(0)) curr++; else curr--;
             }
             s->len[t][i] = curr;
          }
@@ -390,7 +391,7 @@ int32_t BZ2_decompress ( DState* s )
                   the initial RLE), viz, 900k, so bounding N at 2
                   million should guard against overflow without
                   rejecting any legitimate inputs. */
-               if (N >= 0x200000) RETURN(BZ_DATA_ERROR);
+               if (N >= INT32_C(0x200000)) RETURN(BZ_DATA_ERROR);
                if (nextSym == BZ_RUNA) es += N; else
                if (nextSym == BZ_RUNB) es += N << 1;
                N <<= 1;
@@ -497,7 +498,7 @@ int32_t BZ2_decompress ( DState* s )
       }
 
       s->state_out_len = 0;
-      s->state_out_ch  = 0U;
+      s->state_out_ch  = UINT8_C(0);
       BZ_INITIALISE_CRC ( s->calculatedBlockCRC );
       s->state = BZ_X_OUTPUT;
       if (s->verbosity >= 2) VPrintf ( "rt+rld" );
@@ -505,7 +506,7 @@ int32_t BZ2_decompress ( DState* s )
       if (s->smallDecompress) {
 
          /*-- Make a copy of cftab, used in generation of T --*/
-         memcpy (s->cftabCopy, s->cftab, 256U * sizeof(int32_t));
+         memcpy (s->cftabCopy, s->cftab, UINT32_C(256) * sizeof(int32_t));
 
          /*-- compute the T vector --*/
          for (i = 0; i < nblock; i++) {
@@ -539,7 +540,7 @@ int32_t BZ2_decompress ( DState* s )
 
          /*-- compute the T^(-1) vector --*/
          for (i = 0; i < nblock; i++) {
-            uc = (uint8_t)(s->tt[i] & 0xffU);
+            uc = (uint8_t)(s->tt[i] & UINT32_C(0xff));
             s->tt[s->cftab[uc]] |= (i << 8);
             s->cftab[uc]++;
          }
@@ -563,17 +564,17 @@ int32_t BZ2_decompress ( DState* s )
     endhdr_2:
 
       GET_UCHAR(BZ_X_ENDHDR_2, uc);
-      if (uc != 0x72U) RETURN(BZ_DATA_ERROR);
+      if (uc != UINT8_C(0x72)) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_ENDHDR_3, uc);
-      if (uc != 0x45U) RETURN(BZ_DATA_ERROR);
+      if (uc != UINT8_C(0x45)) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_ENDHDR_4, uc);
-      if (uc != 0x38U) RETURN(BZ_DATA_ERROR);
+      if (uc != UINT8_C(0x38)) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_ENDHDR_5, uc);
-      if (uc != 0x50U) RETURN(BZ_DATA_ERROR);
+      if (uc != UINT8_C(0x50)) RETURN(BZ_DATA_ERROR);
       GET_UCHAR(BZ_X_ENDHDR_6, uc);
-      if (uc != 0x90U) RETURN(BZ_DATA_ERROR);
+      if (uc != UINT8_C(0x90)) RETURN(BZ_DATA_ERROR);
 
-      s->storedCombinedCRC = 0U;
+      s->storedCombinedCRC = UINT32_C(0);
       GET_UCHAR(BZ_X_CCRC_1, uc);
       s->storedCombinedCRC = (s->storedCombinedCRC << 8) | ((uint32_t)uc);
       GET_UCHAR(BZ_X_CCRC_2, uc);

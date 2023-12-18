@@ -29,6 +29,7 @@
 
 
 #include <stdio.h>
+#include <stdint.h>
 #include <assert.h>
 #include "bzlib.h"
 
@@ -63,9 +64,9 @@ static char *bzerrorstrings[] = {
 
 void flip_bit ( int bit )
 {
-   int byteno = bit >> 3;
-   int bitno  = bit & 0x7;
-   uchar mask = 1U << bitno;
+   int   byteno = bit >> 3;
+   int   bitno  = bit & 0x7;
+   uchar mask   = UINT8_C(1) << bitno;
    zbuf[byteno] ^= mask;
 }
 
@@ -87,7 +88,7 @@ int main ( int argc, char** argv )
       return 1;
    }
 
-   nIn = (int)fread ( inbuf, 1U, (size_t)M_BLOCK, f );
+   nIn = (int)fread ( inbuf, UINT32_C(1), (size_t)M_BLOCK, f );
    fprintf ( stderr, "%d bytes read\n", nIn );
 
    nZ = M_BLOCK;

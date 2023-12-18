@@ -142,7 +142,7 @@ typedef
 /*---------------------------------------------*/
 static BitStream* bsOpenReadStream ( FILE* stream )
 {
-   BitStream *bs = calloc ( 1U, sizeof(BitStream) );
+   BitStream *bs = calloc ( UINT32_C(1), sizeof(BitStream) );
    if (bs == NULL) callocFail ( sizeof(BitStream) );
    bs->handle = stream;
    bs->mode = 'r';
@@ -153,7 +153,7 @@ static BitStream* bsOpenReadStream ( FILE* stream )
 /*---------------------------------------------*/
 static BitStream* bsOpenWriteStream ( FILE* stream )
 {
-   BitStream *bs = calloc ( 1U, sizeof(BitStream) );
+   BitStream *bs = calloc ( UINT32_C(1), sizeof(BitStream) );
    if (bs == NULL) callocFail ( sizeof(BitStream) );
    bs->handle = stream;
    bs->mode = 'w';
@@ -286,11 +286,11 @@ FILE* fopen_output_safely ( const char* name, const char* mode )
 #  define  BZ_SPLIT_SYM  '/'   /* path splitter on Unix platform */
 #endif
 
-#define BLOCK_HEADER_HI  0x00003141U
-#define BLOCK_HEADER_LO  0x59265359U
+#define BLOCK_HEADER_HI  UINT32_C(0x00003141)
+#define BLOCK_HEADER_LO  UINT32_C(0x59265359)
 
-#define BLOCK_ENDMARK_HI 0x00001772U
-#define BLOCK_ENDMARK_LO 0x45385090U
+#define BLOCK_ENDMARK_HI UINT32_C(0x00001772)
+#define BLOCK_ENDMARK_LO UINT32_C(0x45385090)
 
 /* Increase if necessary.  However, a .bz2 file with > 50000 blocks
    would have an uncompressed size of at least 40GB, so the chances
@@ -348,7 +348,7 @@ int main ( int argc, char** argv )
    fprintf ( stderr, "%s: searching for block boundaries ...\n", progName );
 
    bitsRead = UINT64_C(0);
-   buffHi = buffLo = 0U;
+   buffHi = buffLo = UINT32_C(0);
    currBlock = 0;
    bStart[currBlock] = UINT64_C(0);
 
@@ -371,10 +371,10 @@ int main ( int argc, char** argv )
       }
       buffHi = (buffHi << 1) | (buffLo >> 31);
       buffLo = (buffLo << 1) | (b & 1);
-      if ( ( (buffHi & 0xffffU) == BLOCK_HEADER_HI
+      if ( ( (buffHi & UINT32_C(0xffff)) == BLOCK_HEADER_HI
              && buffLo == BLOCK_HEADER_LO)
            ||
-           ( (buffHi & 0xffffU) == BLOCK_ENDMARK_HI
+           ( (buffHi & UINT32_C(0xffff)) == BLOCK_ENDMARK_HI
              && buffLo == BLOCK_ENDMARK_LO)
          ) {
          if (bitsRead > UINT64_C(49)) {
@@ -420,7 +420,8 @@ int main ( int argc, char** argv )
    bsIn = bsOpenReadStream ( inFile );
 
    /*-- placate gcc's dataflow analyser --*/
-   blockCRC = 0U; bsWr = 0;
+   blockCRC = UINT32_C(0);
+   bsWr = 0;
 
    bitsRead = UINT64_C(0);
    outFile = NULL;

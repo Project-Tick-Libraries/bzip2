@@ -269,7 +269,7 @@ void compressStream ( FILE* stream, FILE* zStream )
    while (true) {
 
       if (myfeof(stream)) break;
-      nIbuf = (int32_t)fread ( ibuf, sizeof(uint8_t), 5000U, stream );
+      nIbuf = (int32_t)fread ( ibuf, sizeof(uint8_t), UINT32_C(5000), stream );
       if (ferror(stream)) goto errhandler_io;
       if (nIbuf > 0) BZ2_bzWrite ( &bzerr, bzf, (void*)ibuf, nIbuf );
       if (bzerr != BZ_OK) goto errhandler;
@@ -298,7 +298,7 @@ void compressStream ( FILE* stream, FILE* zStream )
    if (ret == EOF) goto errhandler_io;
 
    if (verbosity >= 1) {
-      if (nbytes_in_lo32 == 0U && nbytes_in_hi32 == 0U) {
+      if (nbytes_in_lo32 == UINT32_C(0) && nbytes_in_hi32 == UINT32_C(0)) {
          fprintf ( stderr, " no data compressed.\n");
       } else {
          char   buf_nin[32], buf_nout[32];
@@ -421,7 +421,7 @@ trycat:
       rewind(zStream);
       while (true) {
          if (myfeof(zStream)) break;
-         nread = (int32_t)fread ( obuf, sizeof(uint8_t), 5000U, zStream );
+         nread = (int32_t)fread ( obuf, sizeof(uint8_t), UINT32_C(5000), zStream );
          if (ferror(zStream)) goto errhandler_io;
          if (nread > 0) fwrite ( obuf, sizeof(uint8_t), (size_t)nread, stream );
          if (ferror(stream)) goto errhandler_io;
@@ -1624,7 +1624,7 @@ void *myCalloc ( size_t n )
 {
    void* p;
 
-   p = calloc ( 1U, n );
+   p = calloc ( UINT32_C(1), n );
    if (p == NULL) outOfMemory ();
    return p;
 }

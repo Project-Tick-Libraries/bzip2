@@ -414,20 +414,20 @@ typedef
     /* c_tPos is unsigned, hence test < 0 is pointless. */             \
     if (s->tPos >= (uint32_t)(100000 * s->blockSize100k)) return true; \
     s->tPos = s->tt[s->tPos];                                          \
-    cccc = (uint8_t)(s->tPos & 0xffU);                                 \
+    cccc = (uint8_t)(s->tPos & UINT32_C(0xff));                        \
     s->tPos >>= 8;
 
 #define BZ_GET_FAST_C(cccc)                                           \
     /* c_tPos is unsigned, hence test < 0 is pointless. */            \
     if (c_tPos >= (uint32_t)(100000 * ro_blockSize100k)) return true; \
     c_tPos = c_tt[c_tPos];                                            \
-    cccc = (uint8_t)(c_tPos & 0xffU);                                 \
+    cccc = (uint8_t)(c_tPos & UINT32_C(0xff));                        \
     c_tPos >>= 8;
 
-#define SET_LL4(i,n)                                                \
-   { if (((i) & 0x1) == 0)                                          \
-        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & 0xf0U) | (n); else   \
-        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & 0x0fU) | ((n) << 4); \
+#define SET_LL4(i,n)                                                        \
+   { if (((i) & 0x1) == 0)                                                  \
+        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & UINT8_C(0xf0)) | (n); else   \
+        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & UINT8_C(0x0f)) | ((n) << 4); \
    }
 
 #define GET_LL4(i)                             \
@@ -453,9 +453,9 @@ typedef
 #define U32_TO_U64(h, l) \
     ((uint64_t)(h) << 32) | (uint64_t)(l)
 
-#define U64_TO_U32(b, h, l)              \
-   { h = (uint32_t)((b) >> 32);          \
-     l = (uint32_t)((b) & 0xFFFFFFFFU);  \
+#define U64_TO_U32(b, h, l)                      \
+   { h = (uint32_t)((b) >> 32);                  \
+     l = (uint32_t)((b) & UINT64_C(0xFFFFFFFF)); \
    }
 
 
