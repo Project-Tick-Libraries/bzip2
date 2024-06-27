@@ -35,12 +35,10 @@
 
 #define M_BLOCK 1000000
 
-typedef unsigned char uchar;
-
 #define M_BLOCK_OUT (M_BLOCK + 1000000)
-uchar inbuf[M_BLOCK];
-uchar outbuf[M_BLOCK_OUT];
-uchar zbuf[M_BLOCK + 600 + (M_BLOCK / 100)];
+uint8_t inbuf[M_BLOCK];
+uint8_t outbuf[M_BLOCK_OUT];
+uint8_t zbuf[M_BLOCK + 600 + (M_BLOCK / 100)];
 
 int nIn, nOut, nZ;
 
@@ -64,10 +62,10 @@ static char *bzerrorstrings[] = {
 
 void flip_bit ( int bit )
 {
-   int   byteno = bit >> 3;
-   int   bitno  = bit & 0x7;
-   uchar mask   = UINT8_C(1) << bitno;
-   zbuf[byteno] ^= mask;
+   int     byteno = bit >> 3;
+   int     bitno  = bit & 0x7;
+   uint8_t mask   = UINT8_C(1) << bitno;
+   zbuf[byteno]  ^= mask;
 }
 
 int main ( int argc, char** argv )
