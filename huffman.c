@@ -53,10 +53,11 @@
 
 /*---------------------------------------------------*/
 static
+inline
 int32_t addWeights(int32_t a, int32_t b) {
    int32_t da = a & 0x000000ff;
    int32_t db = b & 0x000000ff;
-   return ((a & 0xffffff00) + (b & 0xffffff00)) | (1 + ((da > db) ? da : db));
+   return ((a & (int32_t)0xffffff00) + (b & (int32_t)0xffffff00)) | (1 + ((da > db) ? da : db));
 }
 
 
