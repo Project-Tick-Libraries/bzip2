@@ -114,7 +114,6 @@ void default_bzfree ( void* opaque, void* addr )
 static
 void prepare_new_block ( EState* s )
 {
-   int32_t i;
    s->nblock = 0;
    s->numZ = 0;
    s->state_out_pos = 0;

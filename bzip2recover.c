@@ -457,7 +457,7 @@ int main ( int argc, char** argv )
          /* Create the output file name, correctly handling leading paths.
             (31.10.2001 by Sergey E. Kusikov) */
          char*   split;
-         int32_t ofs, k;
+         int32_t ofs;
          memset (outFileName, 0, sizeof(outFileName));
          strcpy (outFileName, inFileName);
          split = strrchr (outFileName, BZ_SPLIT_SYM);

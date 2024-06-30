@@ -350,7 +350,7 @@ static
 bool uncompressStream ( FILE* zStream, FILE* stream )
 {
    BZFILE*   bzf = NULL;
-   int32_t   bzerr, bzerr_dummy, ret, nread, streamNo, i;
+   int32_t   bzerr, bzerr_dummy, ret, nread, streamNo;
    uint8_t   obuf[5000];
    uint8_t   unused[BZ_MAX_UNUSED];
    int32_t   nUnused;
@@ -469,7 +469,7 @@ static
 bool testStream ( FILE* zStream )
 {
    BZFILE*   bzf = NULL;
-   int32_t   bzerr, bzerr_dummy, ret, streamNo, i;
+   int32_t   bzerr, bzerr_dummy, ret, streamNo;
    uint8_t   obuf[5000];
    uint8_t   unused[BZ_MAX_UNUSED];
    int32_t   nUnused;
@@ -1660,7 +1660,7 @@ Cell *snocString ( Cell* root, const char* name )
 static
 void addFlagsFromEnvVar ( Cell** argList, const char* varName )
 {
-   int32_t i, j, k;
+   int32_t i, k;
    char   *envbase, *p;
 
    envbase = getenv(varName);
