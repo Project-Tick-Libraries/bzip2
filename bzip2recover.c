@@ -142,7 +142,7 @@ typedef
 /*---------------------------------------------*/
 static BitStream* bsOpenReadStream ( FILE* stream )
 {
-   BitStream *bs = calloc ( UINT32_C(1), sizeof(BitStream) );
+   BitStream *bs = calloc ( UINTMAX_C(1), sizeof(BitStream) );
    if (bs == NULL) callocFail ( sizeof(BitStream) );
    bs->handle = stream;
    bs->mode = 'r';
@@ -153,7 +153,7 @@ static BitStream* bsOpenReadStream ( FILE* stream )
 /*---------------------------------------------*/
 static BitStream* bsOpenWriteStream ( FILE* stream )
 {
-   BitStream *bs = calloc ( UINT32_C(1), sizeof(BitStream) );
+   BitStream *bs = calloc ( UINTMAX_C(1), sizeof(BitStream) );
    if (bs == NULL) callocFail ( sizeof(BitStream) );
    bs->handle = stream;
    bs->mode = 'w';
@@ -314,7 +314,7 @@ int main ( int argc, char** argv )
    uint32_t    buffHi, buffLo, blockCRC;
    char*       p;
 
-   strncpy ( progName, argv[0], BZ_MAX_FILENAME-1);
+   strncpy ( progName, argv[0], (size_t)(BZ_MAX_FILENAME-1));
    progName[BZ_MAX_FILENAME-1]='\0';
    inFileName[0] = outFileName[0] = 0;
 

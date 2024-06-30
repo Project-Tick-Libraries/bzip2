@@ -935,7 +935,7 @@ BZFILE* BZ_API(BZ2_bzWriteOpen)
    if (ferror(f))
       { BZ_SETERR(BZ_IO_ERROR); return NULL; };
 
-   bzf = calloc ( UINT32_C(1), sizeof(bzFile) );
+   bzf = calloc ( UINTMAX_C(1), sizeof(bzFile) );
    if (bzf == NULL)
       { BZ_SETERR(BZ_MEM_ERROR); return NULL; };
 
@@ -1103,7 +1103,7 @@ BZFILE* BZ_API(BZ2_bzReadOpen)
    if (ferror(f))
       { BZ_SETERR(BZ_IO_ERROR); return NULL; };
 
-   bzf = calloc ( UINT32_C(1), sizeof(bzFile) );
+   bzf = calloc ( UINTMAX_C(1), sizeof(bzFile) );
    if (bzf == NULL)
       { BZ_SETERR(BZ_MEM_ERROR); return NULL; };
 

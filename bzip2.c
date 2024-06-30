@@ -269,7 +269,7 @@ void compressStream ( FILE* stream, FILE* zStream )
    while (true) {
 
       if (myfeof(stream)) break;
-      nIbuf = (int32_t)fread ( ibuf, sizeof(uint8_t), UINT32_C(5000), stream );
+      nIbuf = (int32_t)fread ( ibuf, sizeof(uint8_t), UINTMAX_C(5000), stream );
       if (ferror(stream)) goto errhandler_io;
       if (nIbuf > 0) BZ2_bzWrite ( &bzerr, bzf, (void*)ibuf, nIbuf );
       if (bzerr != BZ_OK) goto errhandler;
@@ -421,7 +421,7 @@ trycat:
       rewind(zStream);
       while (true) {
          if (myfeof(zStream)) break;
-         nread = (int32_t)fread ( obuf, sizeof(uint8_t), UINT32_C(5000), zStream );
+         nread = (int32_t)fread ( obuf, sizeof(uint8_t), UINTMAX_C(5000), zStream );
          if (ferror(zStream)) goto errhandler_io;
          if (nread > 0) fwrite ( obuf, sizeof(uint8_t), (size_t)nread, stream );
          if (ferror(stream)) goto errhandler_io;
@@ -851,7 +851,7 @@ void copyFileName ( char* to, const char* from )
       exit(exitValue);
    }
 
-  strncpy (to,from,FILE_NAME_LEN-10);
+  strncpy (to,from,(size_t)(FILE_NAME_LEN-10));
   to[FILE_NAME_LEN-10]='\0';
 }
 
@@ -1624,7 +1624,7 @@ void *myCalloc ( size_t n )
 {
    void* p;
 
-   p = calloc ( UINT32_C(1), n );
+   p = calloc ( UINTMAX_C(1), n );
    if (p == NULL) outOfMemory ();
    return p;
 }
@@ -1675,7 +1675,7 @@ void addFlagsFromEnvVar ( Cell** argList, const char* varName )
          while (p[i] != 0 && !isspace((int32_t)(p[i]))) i++;
          if (i > 0) {
             k = i; if (k > FILE_NAME_LEN-10) k = FILE_NAME_LEN-10;
-            strncpy (tmpName, p, k);
+            strncpy (tmpName, p, (size_t)k);
             tmpName[k] = 0;
             APPEND_FLAG(*argList, tmpName);
          }

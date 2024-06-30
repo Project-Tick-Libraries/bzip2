@@ -86,7 +86,7 @@ int main ( int argc, char** argv )
       return 1;
    }
 
-   nIn = (int)fread ( inbuf, UINT32_C(1), (size_t)M_BLOCK, f );
+   nIn = (int)fread ( inbuf, UINTMAX_C(1), (size_t)M_BLOCK, f );
    fprintf ( stderr, "%d bytes read\n", nIn );
 
    nZ = M_BLOCK;
