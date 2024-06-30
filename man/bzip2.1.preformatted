@@ -360,14 +360,8 @@ CCAAVVEEAATTSS
        _b_z_i_p_2_r_e_c_o_v_e_r  versions prior to 1.0.2 used 32‐bit integers
        to represent bit positions in compressed  files,  so  they
        could  not handle compressed files more than 512 megabytes
-       long.  Versions 1.0.2 and above use 64‐bit  ints  on  some
-       platforms  which  support them (GNU supported targets, and
-       Windows).  To establish whether or  not  bzip2recover  was
-       built  with  such  a limitation, run it without arguments.
-       In any event you can build yourself an  unlimited  version
-       if  you  can  recompile  it  with MaybeUInt64 set to be an
-       unsigned 64‐bit integer.
-
+       long.  Versions  1.0.2  and  above  use  64‐bit  ints (GNU
+       supported targets, and Windows).
 
 
 

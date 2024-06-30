@@ -29,17 +29,16 @@
 
 
 #include <stdio.h>
+#include <stdint.h>
 #include <assert.h>
 #include "bzlib.h"
 
 #define M_BLOCK 1000000
 
-typedef unsigned char uchar;
-
 #define M_BLOCK_OUT (M_BLOCK + 1000000)
-uchar inbuf[M_BLOCK];
-uchar outbuf[M_BLOCK_OUT];
-uchar zbuf[M_BLOCK + 600 + (M_BLOCK / 100)];
+uint8_t inbuf[M_BLOCK];
+uint8_t outbuf[M_BLOCK_OUT];
+uint8_t zbuf[M_BLOCK + 600 + (M_BLOCK / 100)];
 
 int nIn, nOut, nZ;
 
@@ -63,12 +62,10 @@ static char *bzerrorstrings[] = {
 
 void flip_bit ( int bit )
 {
-   int byteno = bit / 8;
-   int bitno  = bit % 8;
-   uchar mask = 1 << bitno;
-   //fprintf ( stderr, "(byte %d  bit %d  mask %d)",
-   //          byteno, bitno, (int)mask );
-   zbuf[byteno] ^= mask;
+   int     byteno = bit >> 3;
+   int     bitno  = bit & 0x7;
+   uint8_t mask   = UINT8_C(1) << bitno;
+   zbuf[byteno]  ^= mask;
 }
 
 int main ( int argc, char** argv )
@@ -89,7 +86,7 @@ int main ( int argc, char** argv )
       return 1;
    }
 
-   nIn = fread ( inbuf, 1, M_BLOCK, f );
+   nIn = (int)fread ( inbuf, UINTMAX_C(1), (size_t)M_BLOCK, f );
    fprintf ( stderr, "%d bytes read\n", nIn );
 
    nZ = M_BLOCK;
@@ -99,7 +96,7 @@ int main ( int argc, char** argv )
    assert (r == BZ_OK);
    fprintf ( stderr, "%d after compression\n", nZ );
 
-   for (bit = 0; bit < nZ*8; bit++) {
+   for (bit = 0; bit < (nZ << 3); bit++) {
       fprintf ( stderr, "bit %d  ", bit );
       flip_bit ( bit );
       nOut = M_BLOCK_OUT;

@@ -27,6 +27,9 @@
 #   include <unistd.h>
 #endif
 
+#include <inttypes.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -42,36 +45,15 @@
    This change occurred in version 1.0.2; all prior versions have
    the 512MB limitation.
 */
-#ifdef __GNUC__
-   typedef  unsigned long long int  MaybeUInt64;
-#  define MaybeUInt64_FMT "%Lu"
-#else
-#ifdef _MSC_VER
-   typedef  unsigned __int64  MaybeUInt64;
-#  define MaybeUInt64_FMT "%I64u"
-#else
-   typedef  unsigned int   MaybeUInt64;
-#  define MaybeUInt64_FMT "%u"
-#endif
-#endif
-
-typedef  unsigned int   UInt32;
-typedef  int            Int32;
-typedef  unsigned char  UChar;
-typedef  char           Char;
-typedef  unsigned char  Bool;
-#define True    ((Bool)1)
-#define False   ((Bool)0)
-
 
 #define BZ_MAX_FILENAME 2000
 
-Char inFileName[BZ_MAX_FILENAME];
-Char outFileName[BZ_MAX_FILENAME];
-Char progName[BZ_MAX_FILENAME];
+char inFileName[BZ_MAX_FILENAME];
+char outFileName[BZ_MAX_FILENAME];
+char progName[BZ_MAX_FILENAME];
 
-MaybeUInt64 bytesOut = 0;
-MaybeUInt64 bytesIn  = 0;
+uint64_t bytesOut = UINT64_C(0);
+uint64_t bytesIn  = UINT64_C(0);
 
 
 /*---------------------------------------------------*/
@@ -115,10 +97,10 @@ static void writeError ( void )
 
 
 /*---------------------------------------------*/
-static void mallocFail ( Int32 n )
+static void callocFail ( int32_t n )
 {
    fprintf ( stderr,
-             "%s: malloc failed on request for %d bytes.\n",
+             "%s: calloc failed on request for %d bytes.\n",
             progName, n );
    fprintf ( stderr, "%s: warning: output file(s) may be incomplete.\n",
              progName );
@@ -127,7 +109,7 @@ static void mallocFail ( Int32 n )
 
 
 /*---------------------------------------------*/
-static void tooManyBlocks ( Int32 max_handled_blocks )
+static void tooManyBlocks ( int32_t max_handled_blocks )
 {
    fprintf ( stderr,
              "%s: `%s' appears to contain more than %d blocks\n",
@@ -149,10 +131,10 @@ static void tooManyBlocks ( Int32 max_handled_blocks )
 
 typedef
    struct {
-      FILE*  handle;
-      Int32  buffer;
-      Int32  buffLive;
-      Char   mode;
+      FILE*    handle;
+      int32_t  buffer;
+      int32_t  buffLive;
+      char     mode;
    }
    BitStream;
 
@@ -160,11 +142,9 @@ typedef
 /*---------------------------------------------*/
 static BitStream* bsOpenReadStream ( FILE* stream )
 {
-   BitStream *bs = malloc ( sizeof(BitStream) );
-   if (bs == NULL) mallocFail ( sizeof(BitStream) );
+   BitStream *bs = calloc ( UINTMAX_C(1), sizeof(BitStream) );
+   if (bs == NULL) callocFail ( sizeof(BitStream) );
    bs->handle = stream;
-   bs->buffer = 0;
-   bs->buffLive = 0;
    bs->mode = 'r';
    return bs;
 }
@@ -173,21 +153,19 @@ static BitStream* bsOpenReadStream ( FILE* stream )
 /*---------------------------------------------*/
 static BitStream* bsOpenWriteStream ( FILE* stream )
 {
-   BitStream *bs = malloc ( sizeof(BitStream) );
-   if (bs == NULL) mallocFail ( sizeof(BitStream) );
+   BitStream *bs = calloc ( UINTMAX_C(1), sizeof(BitStream) );
+   if (bs == NULL) callocFail ( sizeof(BitStream) );
    bs->handle = stream;
-   bs->buffer = 0;
-   bs->buffLive = 0;
    bs->mode = 'w';
    return bs;
 }
 
 
 /*---------------------------------------------*/
-static void bsPutBit ( BitStream* bs, Int32 bit )
+static void bsPutBit ( BitStream* bs, int32_t bit )
 {
    if (bs->buffLive == 8) {
-      Int32 retVal = putc ( (UChar) bs->buffer, bs->handle );
+      int32_t retVal = putc ( bs->buffer, bs->handle );
       if (retVal == EOF) writeError();
       bytesOut++;
       bs->buffLive = 1;
@@ -203,13 +181,13 @@ static void bsPutBit ( BitStream* bs, Int32 bit )
 /*--
    Returns 0 or 1, or 2 to indicate EOF.
 --*/
-static Int32 bsGetBit ( BitStream* bs )
+static int32_t bsGetBit ( BitStream* bs )
 {
    if (bs->buffLive > 0) {
       bs->buffLive --;
       return ( ((bs->buffer) >> (bs->buffLive)) & 0x1 );
    } else {
-      Int32 retVal = getc ( bs->handle );
+      int32_t retVal = getc ( bs->handle );
       if ( retVal == EOF ) {
          if (errno != 0) readError();
          return 2;
@@ -224,14 +202,13 @@ static Int32 bsGetBit ( BitStream* bs )
 /*---------------------------------------------*/
 static void bsClose ( BitStream* bs )
 {
-   Int32 retVal;
+   int32_t retVal;
 
    if ( bs->mode == 'w' ) {
-      while ( bs->buffLive < 8 ) {
-         bs->buffLive++;
+      for (; bs->buffLive < 8; bs->buffLive++) {
          bs->buffer <<= 1;
-      };
-      retVal = putc ( (UChar) (bs->buffer), bs->handle );
+      }
+      retVal = putc ( bs->buffer, bs->handle );
       if (retVal == EOF) writeError();
       bytesOut++;
       retVal = fflush ( bs->handle );
@@ -246,18 +223,18 @@ static void bsClose ( BitStream* bs )
 
 
 /*---------------------------------------------*/
-static void bsPutUChar ( BitStream* bs, UChar c )
+static void bsPutUChar ( BitStream* bs, uint8_t c )
 {
-   Int32 i;
+   int32_t i;
    for (i = 7; i >= 0; i--)
-      bsPutBit ( bs, (((UInt32) c) >> i) & 0x1 );
+      bsPutBit ( bs, (((uint32_t) c) >> i) & 0x1 );
 }
 
 
 /*---------------------------------------------*/
-static void bsPutUInt32 ( BitStream* bs, UInt32 c )
+static void bsPutUInt32 ( BitStream* bs, uint32_t c )
 {
-   Int32 i;
+   int32_t i;
 
    for (i = 31; i >= 0; i--)
       bsPutBit ( bs, (c >> i) & 0x1 );
@@ -265,10 +242,10 @@ static void bsPutUInt32 ( BitStream* bs, UInt32 c )
 
 
 /*---------------------------------------------*/
-static Bool endsInBz2 ( Char* name )
+static bool endsInBz2 ( const char* name )
 {
-   Int32 n = strlen ( name );
-   if (n <= 4) return False;
+   int32_t n = strlen ( name );
+   if (n <= 4) return false;
    return
       (name[n-4] == '.' &&
        name[n-3] == 'b' &&
@@ -281,7 +258,7 @@ static Bool endsInBz2 ( Char* name )
  * Opens a file, but refuses to overwrite an existing one.
  */
 static
-FILE* fopen_output_safely ( Char* name, const char* mode )
+FILE* fopen_output_safely ( const char* name, const char* mode )
 {
 #  if BZ_UNIX
    FILE*     fp;
@@ -309,11 +286,11 @@ FILE* fopen_output_safely ( Char* name, const char* mode )
 #  define  BZ_SPLIT_SYM  '/'   /* path splitter on Unix platform */
 #endif
 
-#define BLOCK_HEADER_HI  0x00003141UL
-#define BLOCK_HEADER_LO  0x59265359UL
+#define BLOCK_HEADER_HI  UINT32_C(0x00003141)
+#define BLOCK_HEADER_LO  UINT32_C(0x59265359)
 
-#define BLOCK_ENDMARK_HI 0x00001772UL
-#define BLOCK_ENDMARK_LO 0x45385090UL
+#define BLOCK_ENDMARK_HI UINT32_C(0x00001772)
+#define BLOCK_ENDMARK_LO UINT32_C(0x45385090)
 
 /* Increase if necessary.  However, a .bz2 file with > 50000 blocks
    would have an uncompressed size of at least 40GB, so the chances
@@ -321,23 +298,23 @@ FILE* fopen_output_safely ( Char* name, const char* mode )
 */
 #define BZ_MAX_HANDLED_BLOCKS 50000
 
-MaybeUInt64 bStart [BZ_MAX_HANDLED_BLOCKS];
-MaybeUInt64 bEnd   [BZ_MAX_HANDLED_BLOCKS];
-MaybeUInt64 rbStart[BZ_MAX_HANDLED_BLOCKS];
-MaybeUInt64 rbEnd  [BZ_MAX_HANDLED_BLOCKS];
+uint64_t bStart [BZ_MAX_HANDLED_BLOCKS];
+uint64_t bEnd   [BZ_MAX_HANDLED_BLOCKS];
+uint64_t rbStart[BZ_MAX_HANDLED_BLOCKS];
+uint64_t rbEnd  [BZ_MAX_HANDLED_BLOCKS];
 
-Int32 main ( Int32 argc, Char** argv )
+int main ( int argc, char** argv )
 {
    FILE*       inFile;
    FILE*       outFile;
    BitStream*  bsIn, *bsWr;
-   Int32       b, wrBlock, currBlock, rbCtr;
-   MaybeUInt64 bitsRead;
+   int32_t     b, wrBlock, currBlock, rbCtr;
+   uint64_t    bitsRead;
 
-   UInt32      buffHi, buffLo, blockCRC;
-   Char*       p;
+   uint32_t    buffHi, buffLo, blockCRC;
+   char*       p;
 
-   strncpy ( progName, argv[0], BZ_MAX_FILENAME-1);
+   strncpy ( progName, argv[0], (size_t)(BZ_MAX_FILENAME-1));
    progName[BZ_MAX_FILENAME-1]='\0';
    inFileName[0] = outFileName[0] = 0;
 
@@ -347,24 +324,8 @@ Int32 main ( Int32 argc, Char** argv )
    if (argc != 2) {
       fprintf ( stderr, "%s: usage is `%s damaged_file_name'.\n",
                         progName, progName );
-      switch (sizeof(MaybeUInt64)) {
-         case 8:
-            fprintf(stderr,
-                    "\trestrictions on size of recovered file: None\n");
-            break;
-         case 4:
-            fprintf(stderr,
-                    "\trestrictions on size of recovered file: 512 MB\n");
-            fprintf(stderr,
-                    "\tto circumvent, recompile with MaybeUInt64 as an\n"
-                    "\tunsigned 64-bit int.\n");
-            break;
-         default:
-            fprintf(stderr,
-                    "\tsizeof(MaybeUInt64) is not 4 or 8 -- "
-                    "configuration error.\n");
-            break;
-      }
+      fprintf ( stderr,
+               "\trestrictions on size of recovered file: None\n" );
       exit(1);
    }
 
@@ -386,23 +347,23 @@ Int32 main ( Int32 argc, Char** argv )
    bsIn = bsOpenReadStream ( inFile );
    fprintf ( stderr, "%s: searching for block boundaries ...\n", progName );
 
-   bitsRead = 0;
-   buffHi = buffLo = 0;
+   bitsRead = UINT64_C(0);
+   buffHi = buffLo = UINT32_C(0);
    currBlock = 0;
-   bStart[currBlock] = 0;
+   bStart[currBlock] = UINT64_C(0);
 
    rbCtr = 0;
 
-   while (True) {
+   while (true) {
       b = bsGetBit ( bsIn );
       bitsRead++;
       if (b == 2) {
          if (bitsRead >= bStart[currBlock] &&
-            (bitsRead - bStart[currBlock]) >= 40) {
-            bEnd[currBlock] = bitsRead-1;
+            (bitsRead - bStart[currBlock]) >= UINT64_C(40)) {
+            bEnd[currBlock] = bitsRead - UINT64_C(1);
             if (currBlock > 0)
-               fprintf ( stderr, "   block %d runs from " MaybeUInt64_FMT
-                                 " to " MaybeUInt64_FMT " (incomplete)\n",
+               fprintf ( stderr, "   block %d runs from %" PRIu64
+                                 " to %" PRIu64 " (incomplete)\n",
                          currBlock,  bStart[currBlock], bEnd[currBlock] );
          } else
             currBlock--;
@@ -410,21 +371,21 @@ Int32 main ( Int32 argc, Char** argv )
       }
       buffHi = (buffHi << 1) | (buffLo >> 31);
       buffLo = (buffLo << 1) | (b & 1);
-      if ( ( (buffHi & 0x0000ffff) == BLOCK_HEADER_HI
+      if ( ( (buffHi & UINT32_C(0xffff)) == BLOCK_HEADER_HI
              && buffLo == BLOCK_HEADER_LO)
            ||
-           ( (buffHi & 0x0000ffff) == BLOCK_ENDMARK_HI
+           ( (buffHi & UINT32_C(0xffff)) == BLOCK_ENDMARK_HI
              && buffLo == BLOCK_ENDMARK_LO)
          ) {
-         if (bitsRead > 49) {
-            bEnd[currBlock] = bitsRead-49;
+         if (bitsRead > UINT64_C(49)) {
+            bEnd[currBlock] = bitsRead - UINT64_C(49);
          } else {
-            bEnd[currBlock] = 0;
+            bEnd[currBlock] = UINT64_C(0);
          }
          if (currBlock > 0 &&
-             (bEnd[currBlock] - bStart[currBlock]) >= 130) {
-            fprintf ( stderr, "   block %d runs from " MaybeUInt64_FMT
-                              " to " MaybeUInt64_FMT "\n",
+             (bEnd[currBlock] - bStart[currBlock]) >= UINT64_C(130)) {
+            fprintf ( stderr, "   block %d runs from %" PRIu64
+                              " to %" PRIu64 "\n",
                       rbCtr+1,  bStart[currBlock], bEnd[currBlock] );
             rbStart[rbCtr] = bStart[currBlock];
             rbEnd[rbCtr] = bEnd[currBlock];
@@ -459,17 +420,18 @@ Int32 main ( Int32 argc, Char** argv )
    bsIn = bsOpenReadStream ( inFile );
 
    /*-- placate gcc's dataflow analyser --*/
-   blockCRC = 0; bsWr = 0;
+   blockCRC = UINT32_C(0);
+   bsWr = 0;
 
-   bitsRead = 0;
+   bitsRead = UINT64_C(0);
    outFile = NULL;
    wrBlock = 0;
-   while (True) {
+   while (true) {
       b = bsGetBit(bsIn);
       if (b == 2) break;
       buffHi = (buffHi << 1) | (buffLo >> 31);
       buffLo = (buffLo << 1) | (b & 1);
-      if (bitsRead == 47+rbStart[wrBlock])
+      if (bitsRead == UINT64_C(47) + rbStart[wrBlock])
          blockCRC = (buffHi << 16) | (buffLo >> 16);
 
       if (outFile != NULL && bitsRead >= rbStart[wrBlock]
@@ -494,10 +456,9 @@ Int32 main ( Int32 argc, Char** argv )
       if (bitsRead == rbStart[wrBlock]) {
          /* Create the output file name, correctly handling leading paths.
             (31.10.2001 by Sergey E. Kusikov) */
-         Char* split;
-         Int32 ofs, k;
-         for (k = 0; k < BZ_MAX_FILENAME; k++)
-            outFileName[k] = 0;
+         char*   split;
+         int32_t ofs;
+         memset (outFileName, 0, sizeof(outFileName));
          strcpy (outFileName, inFileName);
          split = strrchr (outFileName, BZ_SPLIT_SYM);
          if (split == NULL) {

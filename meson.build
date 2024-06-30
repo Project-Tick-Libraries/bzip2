@@ -3,7 +3,7 @@ project(
   ['c'],
   version : '1.1.0',
   meson_version : '>= 0.56.0',
-  default_options : ['c_std=c89', 'warning_level=1'],
+  default_options : ['c_std=c99', 'warning_level=1'],
 )
 
 conf_data = configuration_data()

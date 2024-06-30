@@ -13,6 +13,9 @@ set(LT_CURRENT  1)
 set(LT_REVISION 9)
 set(LT_AGE      0)
 
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED TRUE)
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 include(Version)
 include(SymLink)

@@ -650,13 +650,7 @@ file in the stream.</para>
 prior to 1.0.2 used 32-bit integers to represent bit positions in
 compressed files, so it could not handle compressed files more
 than 512 megabytes long.  Versions 1.0.2 and above use 64-bit ints
-on some platforms which support them (GNU supported targets, and
-Windows). To establish whether or not
-<computeroutput>bzip2recover</computeroutput> was built with such
-a limitation, run it without arguments. In any event you can
-build yourself an unlimited version if you can recompile it with
-<computeroutput>MaybeUInt64</computeroutput> set to be an
-unsigned 64-bit integer.</para>
+(GNU supported targets, and Windows).</para>
 
 </sect1>
 
@@ -1062,7 +1056,7 @@ typedef struct {
 
   void *state;
 
-  void *(*bzalloc)(void *,int,int);
+  void *(*bzalloc)(void *, int, int);
   void (*bzfree)(void *,void *);
   void *opaque;
 } bz_stream;
@@ -1101,7 +1095,7 @@ opaque, p )</computeroutput> should free that memory.</para>
 <computeroutput>bzfree</computeroutput> and
 <computeroutput>opaque</computeroutput> to
 <computeroutput>NULL</computeroutput>, and the library will then
-use the standard <computeroutput>malloc</computeroutput> /
+use the standard <computeroutput>calloc</computeroutput> /
 <computeroutput>free</computeroutput> routines.</para>
 
 <para>Before calling
@@ -1456,7 +1450,7 @@ allocated and initialised before the call.  Fields
 <computeroutput>opaque</computeroutput> should be set if a custom
 memory allocator is required, or made
 <computeroutput>NULL</computeroutput> for the normal
-<computeroutput>malloc</computeroutput> /
+<computeroutput>calloc</computeroutput> /
 <computeroutput>free</computeroutput> routines.  Upon return, the
 internal state will have been initialised, and
 <computeroutput>total_in</computeroutput> and
@@ -1687,7 +1681,7 @@ general points.</para>
   platforms.</para></listitem>
 
  <listitem><para>Memory allocation requests are handled by
-  <computeroutput>malloc</computeroutput> /
+  <computeroutput>calloc</computeroutput> /
   <computeroutput>free</computeroutput>.  At present there is no
   facility for user-defined memory allocators in the file I/O
   functions (could easily be added, though).</para></listitem>
@@ -2678,19 +2672,6 @@ complexity.</para>
 <para>Most people should be able to compile the library and
 program under Unix straight out-of-the-box, so to speak,
 especially if you have a version of GNU C available.</para>
-
-<para>There are a couple of
-<computeroutput>__inline__</computeroutput> directives in the
-code.  GNU C (<computeroutput>gcc</computeroutput>) should be
-able to handle them.  If you're not using GNU C, your C compiler
-shouldn't see them at all.  If your compiler does, for some
-reason, see them and doesn't like them, just
-<computeroutput>#define</computeroutput>
-<computeroutput>__inline__</computeroutput> to be
-<computeroutput>/* */</computeroutput>.  One easy way to do this
-is to compile with the flag
-<computeroutput>-D__inline__=</computeroutput>, which should be
-understood by most Unix compilers.</para>
 
 <para>If you still have difficulties, try compiling with the
 macro <computeroutput>BZ_STRICT_ANSI</computeroutput> defined.
