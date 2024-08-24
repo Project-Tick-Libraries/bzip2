@@ -172,6 +172,6 @@ pkg.generate(
 ## install headers
 install_headers('bzlib.h')
 
-subdir('man')
 subdir('docs')
+subdir('docs/man')
 subdir('tests')
