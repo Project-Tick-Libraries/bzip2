@@ -425,7 +425,7 @@ if(ENABLE_APP AND Python3_FOUND)
     add_subdirectory(tests)
 endif()
 
-add_subdirectory(man)
+add_subdirectory(docs/man)
 
 set(DOCGEN_EXECS xsltproc perl xmllint grep pdfxmltex pdftops)
 

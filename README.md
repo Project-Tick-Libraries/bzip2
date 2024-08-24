@@ -33,7 +33,7 @@ manual page is available as bzip2.txt.
 ## Community Code of Conduct
 
 There is a code of conduct for contributors to Bzip2/libbz2.
-Please see the [`code-of-conduct.md`](code-of-conduct.md) file.
+Please see the [`code-of-conduct.md`](docs/code-of-conduct.md) file.
 
 ## Contributing to Bzip2's development
 
@@ -61,7 +61,7 @@ reported the same issue.
 
 ## Compiling Bzip2 and libbz2
 
-Please see the [`COMPILING.md`](COMPILING.md) file for details.
+Please see the [`COMPILING.md`](docs/COMPILING.md) file for details.
 This includes instructions for building using Meson or CMake.
 
 ## WARNING
