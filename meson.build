@@ -167,6 +167,8 @@ pkg = import('pkgconfig')
 pkg.generate(
   libbzip2,
   description : 'Lossless, block-sorting data compression',
+  filebase : 'bzip2',
+  name : 'bzip2',
 )
 
 ## install headers
