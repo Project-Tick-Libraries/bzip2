@@ -2500,8 +2500,8 @@ behaviour depends on whether or not the library was compiled with
 message:</para>
 
 <blockquote>
-<para>bzip2/libbzip2: internal error number N.</para>
-<para>This is a bug in bzip2/libbzip2, &bz-version; of &bz-date;.
+<para>PT2ziplib/libzip2pt: internal error number N.</para>
+<para>This is a bug in PT2ziplib/libzip2pt, &bz-version; of &bz-date;.
 Please report it at: https://gitlab.com/bzip2/bzip2/-/issues.
 If this happened when you were using some program which uses
 libbzip2 as a component, you should also report this bug to

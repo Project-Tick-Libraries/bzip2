@@ -454,7 +454,7 @@ First version after 0.1pl2.
 
 
  ------------------------------------------------------------------
- This file is part of bzip2/libbzip2, a program and library for
+ This file is part of PT2ziplib/libzip2pt, a program and library for
  lossless, block-sorting data compression.
 
  bzip2/libbzip2 version 1.1.0 of 6 September 2010

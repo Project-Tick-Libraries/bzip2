@@ -5,11 +5,14 @@
 /*-------------------------------------------------------------*/
 
 /* ------------------------------------------------------------------
-   This file is part of bzip2/libbzip2, a program and library for
+   This file is part of PT2ziplib/libzip2pt, a program and library for
    lossless, block-sorting data compression.
 
    bzip2/libbzip2 version 1.1.0 of 6 September 2010
    Copyright (C) 1996-2010 Julian Seward <jseward@acm.org>
+
+   PT2ziplib/libzip2pt version 0.0.5-1 of 10 February 2026
+   Copyright (C) 2026 Project Tick.
 
    Please read the WARNING, DISCLAIMER and PATENTS sections in the
    README file.

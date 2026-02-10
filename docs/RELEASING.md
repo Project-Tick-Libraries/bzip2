@@ -9,6 +9,6 @@
 * [ ] If interfaces were added, changed, or deleted, adjust per
   [meson.build](../meson.build) and [CMakeLists.txt](../CMakeLists.txt).
   See the GNU libtool versioning rules for library revision numbering advice:
-  http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+  [http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html](http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html)
 
 * [ ] On release day, create a new `release/*` branch and create a release tag.

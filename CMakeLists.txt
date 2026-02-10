@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 project(bzip2
-        VERSION 1.1.0
+        VERSION 0.0.5
         DESCRIPTION "This Bzip2/libbz2 a program and library for lossless block-sorting data compression."
         LANGUAGES C)
 
@@ -9,9 +9,9 @@ project(bzip2
 #  http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 #
 # KEEP THESE IN SYNC WITH meson.build OR STUFF WILL BREAK!
-set(LT_CURRENT  1)
-set(LT_REVISION 9)
-set(LT_AGE      0)
+set(LT_CURRENT  0)
+set(LT_REVISION 0)
+set(LT_AGE      5)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 include(Version)
@@ -285,6 +285,9 @@ target_sources(bz2_ObjLib
     PRIVATE   ${BZ2_SOURCES}
     PUBLIC    ${CMAKE_CURRENT_SOURCE_DIR}/bzlib_private.h
     INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h)
+target_include_directories(bz2_ObjLib PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Windows resource file
 set(BZ2_RES "")
@@ -305,6 +308,9 @@ if(ENABLE_SHARED_LIB)
                   ${CMAKE_CURRENT_SOURCE_DIR}/libbz2.def
         PUBLIC    ${CMAKE_CURRENT_SOURCE_DIR}/bzlib_private.h
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h)
+    target_include_directories(bz2 PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_CURRENT_BINARY_DIR}")
 
     # Always use '-fPIC'/'-fPIE' option for shared libraries.
     set_property(TARGET bz2 PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -312,7 +318,10 @@ if(ENABLE_SHARED_LIB)
     set_target_properties(bz2 PROPERTIES
         COMPILE_FLAGS "${WARNCFLAGS}"
         VERSION ${LT_VERSION} SOVERSION ${LT_SOVERSION})
-    install(TARGETS bz2 DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(TARGETS bz2
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(FILES bzlib.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
     if(USE_OLD_SONAME)
@@ -344,6 +353,9 @@ if(ENABLE_STATIC_LIB)
         PRIVATE     ${BZ2_SOURCES}
         PUBLIC      ${CMAKE_CURRENT_SOURCE_DIR}/bzlib_private.h
         INTERFACE   ${CMAKE_CURRENT_SOURCE_DIR}/bzlib.h)
+    target_include_directories(bz2_static PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_CURRENT_BINARY_DIR}")
 
     # Use '-fPIC'/'-fPIE' option for static libraries by default.
     # You may build with ENABLE_STATIC_LIB_IS_PIC=OFF to disable PIC for the static library.
@@ -357,7 +369,8 @@ if(ENABLE_STATIC_LIB)
         SOVERSION           ${LT_SOVERSION}
         ARCHIVE_OUTPUT_NAME bz2_static)
     target_compile_definitions(bz2_static PUBLIC BZ2_STATICLIB)
-    install(TARGETS bz2_static DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(TARGETS bz2_static
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(FILES bzlib.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 endif()
 
